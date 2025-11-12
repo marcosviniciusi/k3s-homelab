@@ -1,0 +1,26 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: dsoares-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: dsoares-service-token
+        secretNamespace: igpu
+      secretsScope:
+        envSlug: production
+        secretsPath: /photoprism-dsoares
+
+  managedKubeSecretReferences:
+    - secretName: dsoares-secrets
+      secretNamespace: igpu
+      secretType: Opaque
+      template:
+        includeAllSecrets: true
+
+
+

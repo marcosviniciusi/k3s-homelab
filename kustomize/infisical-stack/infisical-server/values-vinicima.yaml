@@ -1,0 +1,77 @@
+infisical:
+  enabled: true # -- Enable Infisical chart deployment
+  name: infisical # -- Sets the name of the deployment within this chart
+  autoDatabaseSchemaMigration: true
+  databaseSchemaMigrationJob:
+    image:
+      repository: ghcr.io/groundnuty/k8s-wait-for
+      tag: no-root-v2.0
+      pullPolicy: IfNotPresent
+  serviceAccount:
+    create: true
+  replicaCount: 3
+  image:
+    repository: infisical/infisical
+    tag: "v0.132.4-postgres"
+    pullPolicy: IfNotPresent
+  kubeSecretRef: "infisical-secrets"
+  resources:
+    limits:
+      memory: 4000Mi
+      cpu: 4000m
+    requests:
+      cpu: 2000m
+      memory: 2000Mi
+
+ingress:
+  enabled: false
+  # -- Hostname for ingress access, e.g., app.example.com
+  hostName: "cofre.vinicima.com"
+  # -- Specifies the ingress class, useful for multi-ingress setups
+  ingressClassName: nginx
+  nginx:
+    enabled: false
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"                # Redireciona HTTP para HTTPS
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"          # Garante o redirect SSL
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"              # Limite de tamanho de upload (ajuste conforme o app)
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"          # Timeout maior para apps que demoram pra responder
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"   # Força uso de ciphers mais seguros
+    nginx.ingress.kubernetes.io/use-regex: "false"    
+  tls:
+    secretName: vinicima-com-tls
+    hosts:
+      - cofre-k8s.vinicima.com
+      - cofre.vinicima.com
+postgresql:
+  # -- Enables an in-cluster PostgreSQL deployment. To achieve HA for Postgres, we recommend deploying https://github.com/zalando/postgres-operator instead.
+  enabled: false
+  # -- PostgreSQL resource name
+  name: "postgresql"
+  # -- Full name override for PostgreSQL resources
+  fullnameOverride: "postgresql"
+  auth:
+    # -- Database username for PostgreSQL
+    username: infisical
+    # -- Password for PostgreSQL database access
+    password:
+    # -- Database name for Infisical
+    database:
+  useExistingPostgresSecret:
+    enabled: true
+    existingConnectionStringSecret:
+      name: "infisical-postgres-secret"
+      key: "DATABASE_URL"
+
+redis:
+  enabled: false
+  name: "redis"
+  fullnameOverride: "redis"
+  cluster:
+    enabled: false
+  usePassword: true
+  auth:
+
+    password: ""
+  architecture: standalone

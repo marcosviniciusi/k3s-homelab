@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: infisical-operator
+resources:
+  - infisical-operator-clusterrole-secrets-operato-proxy-role.yaml
+  - infisical-operator-clusterrole-secrets-operator-manager-role.yaml
+  - infisical-operator-clusterrole-secrets-operator-metrics-reader.yaml
+  - infisical-operator-clusterrolebinding-secrets-operato-manager-rolebinding.yaml
+  - infisical-operator-clusterrolebinding-secrets-operato-proxy-rolebinding.yaml
+  - infisical-operator-crd-clustergenerators.secrets.yaml
+  - infisical-operator-crd-infisicaldynamicsecrets-secrets.yaml
+  - infisical-operator-crd-infisicalpushsecrets-secrets.yaml 
+  - infisical-operator-crd-infisicalsecrets-secrets.yaml
+  - infisical-operator-deployment-secrets-operato-controller-manager.yaml
+  - infisical-operator-role-secrets-operato-leader-election-role.yaml
+  - infisical-operator-rolebinding-secrets-operato-leader-election-rolebinding.yaml
+  - infisical-operator-service-secrets-operato-controller-manager-metrics-service.yaml
+  - infisical-operator-serviceaccount-secrets-operato-controller-manager.yaml

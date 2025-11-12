@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: libretranslate
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: libretranslate
+  template:
+    metadata:
+      labels:
+        app: libretranslate
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aloy
+                - joel
+                - ellie
+      initContainers:
+      - name: init-libretranslate
+        image: libretranslate/libretranslate:latest
+        securityContext:
+          runAsUser: 0  # Rodando como root para poder rodar o chown
+        command:
+          - /bin/sh
+          - -c
+          - |
+            echo "Initializing environment..."
+            mkdir -p /home/libretranslate/.local/share/argos-translate/packages
+            chown -R 1032:1032 /home/libretranslate/.local /app/db
+            # Outras tarefas iniciais podem ser colocadas aqui
+            echo "Initialization complete!"
+        volumeMounts:
+        - name: libre-translate-models
+          mountPath: /home/libretranslate/.local/
+        - name: libre-translate-db
+          mountPath: /app/db/
+      containers:
+      - name: libretranslate
+        image: libretranslate/libretranslate:latest
+        resources:
+          limits:
+            memory: "8Gi"
+            cpu: "8000m"
+        ports:
+        - containerPort: 5000
+        env:
+         - name: LT_DEBUG
+           value: "True"
+       # - name: "LT_LOAD_ONLY"
+       #   valueFrom:
+       #     configMapKeyRef:
+       #       name: libretranslate-config
+       #       key: langs
+        volumeMounts:
+        - name: libre-translate-models
+          mountPath: /home/libretranslate/.local/
+        - name: libre-translate-db
+          mountPath: /app/db/
+      volumes:
+      - name: libre-translate-models
+        persistentVolumeClaim:
+          claimName: libre-translate-models
+      - name: libre-translate-db
+        persistentVolumeClaim:
+          claimName: libre-translate-db

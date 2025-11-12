@@ -1,0 +1,26 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: bazarr-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: bazarr-service-token
+        secretNamespace: arr
+      secretsScope:
+        envSlug: production
+        secretsPath: /bazarr
+
+  managedKubeSecretReferences:
+    - secretName: bazarr-secrets
+      secretNamespace: arr
+      secretType: Opaque
+      template:
+        includeAllSecrets: true
+
+
+

@@ -1,0 +1,26 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: keel-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: keel-service-token
+        secretNamespace: kube-system
+      secretsScope:
+        envSlug: production
+        secretsPath: /keel
+
+  managedKubeSecretReferences:
+    - secretName: keel-secrets
+      secretNamespace: kube-system
+      secretType: Opaque
+      template:
+        includeAllSecrets: true
+
+
+

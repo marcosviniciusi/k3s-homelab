@@ -1,0 +1,119 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jellyfin
+  labels:
+    app: jellyfin
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"   
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aloy
+      containers:
+      - name: jellyfin
+        image: ghcr.io/hotio/jellyfin:latest
+        ports:
+        - name: jellyfin
+          containerPort: 8096
+        env:
+        - name: PUID
+          value: "10000"
+        - name: PGID
+          value: "10000"
+        - name: TZ
+          value: "America/Sao_Paulo"
+        resources:
+          limits:
+            gpu.intel.com/i915: "2"
+      #  livenessProbe:
+      #    httpGet:
+      #      path: /
+      #      port: 8096
+      #    initialDelaySeconds: 30
+      #    periodSeconds: 60
+      #    failureThreshold: 3
+      #  readinessProbe:
+      #    httpGet:
+      #      path: /
+      #      port: 8096
+      #    initialDelaySeconds: 240
+      #    periodSeconds: 30
+      #    failureThreshold: 3
+        volumeMounts:
+        - name: jellyfin
+          mountPath: /config
+        - name: movies
+          mountPath: /data/videos/movies
+          readOnly: true
+        - name: animes-movies
+          mountPath: /data/videos/animes-movies
+          readOnly: true
+        - name: series
+          mountPath: /data/videos/series
+          readOnly: true
+        - name: animes
+          mountPath: /data/videos/animes
+          readOnly: true
+        - name: cursos
+          mountPath: /data/videos/cursos
+          readOnly: true
+        - name: xxx
+          mountPath: /data/videos/XXX
+          readOnly: true
+        - name: jellyfin-transcode
+          mountPath: /config/cache/transcodes
+      volumes:
+      - name: jellyfin
+        persistentVolumeClaim:
+          claimName: jellyfin
+      - name: movies
+        nfs:
+          server: 192.168.253.250
+          path: /export/data/videos/movies
+      - name: animes-movies
+        nfs:
+          server: 192.168.253.250
+          path: /export/data/videos/animes-movies
+      - name: series
+        nfs:
+          server: 192.168.253.250
+          path: /export/data2/videos/series
+      - name: animes
+        nfs:
+          server: 192.168.253.250
+          path: /export/data2/videos/animes
+      - name: cursos
+        nfs:
+          server: 192.168.253.250
+          path: /export/data2/videos/cursos
+      - name: xxx
+        nfs:
+          server: 192.168.253.250
+          path: /export/data2/videos/XXX
+      - name: jellyfin-transcode
+        emptyDir:
+          medium: Memory
+          sizeLimit: 12Gi
+

@@ -1,0 +1,23 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: mgabriel-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: mgabriel-service-token
+        secretNamespace: igpu
+      secretsScope:
+        envSlug: production
+        secretsPath: /photoprism-mgabriel
+
+  managedKubeSecretReferences:
+    - secretName: mgabriel-secrets
+      secretNamespace: igpu
+      secretType: Opaque
+      template:
+        includeAllSecrets: true

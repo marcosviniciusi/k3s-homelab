@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lingarr-animes
+spec:
+  selector:
+    app: lingarr-animes
+  type: ClusterIP
+  ports:
+    - port: 9876
+      targetPort: lingarr-animes

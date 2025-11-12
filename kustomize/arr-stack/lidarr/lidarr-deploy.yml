@@ -1,0 +1,90 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: lidarr
+  labels:
+    app: lidarr
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lidarr
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-dotnet: "true"
+        sidecar.opentelemetry.io/inject: "true"
+      labels:
+        app: lidarr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: lidarr
+        image: lscr.io/linuxserver/lidarr:latest
+        ports:
+        - name: lidarr
+          containerPort: 8686
+        envFrom:
+        - secretRef:
+            name: lidarr-secrets
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8686
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8686
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        volumeMounts:
+        - name: lidarr
+          mountPath: /config
+        - name: musics
+          mountPath: /data/musics
+        - name: p2p
+          mountPath: /data/p2p/complete/audio
+        - name: usenet
+          mountPath: /data/usenet/complete/audio
+        - name: soulseek
+          mountPath: /data/soulseek/complete
+      volumes:
+      - name: lidarr
+        hostPath:
+          path: /k8s/lidarr
+          type: Directory
+      - name: musics
+        hostPath:
+          path: /data/musics
+          type: Directory
+      - name: p2p
+        hostPath:
+          path: /data/p2p/complete/audio
+          type: Directory
+      - name: usenet
+        hostPath:
+          path: /data/usenet/complete/audio
+          type: Directory
+      - name: soulseek
+        hostPath:
+          path: /data/soulseek/complete
+          type: Directory

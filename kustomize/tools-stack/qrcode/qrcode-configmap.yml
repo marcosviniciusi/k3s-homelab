@@ -1,0 +1,85 @@
+apiVersion: v1
+data:
+  apache2.conf: "DefaultRuntimeDir ${APACHE_RUN_DIR}\nPidFile ${APACHE_PID_FILE}\nTimeout
+    300\nKeepAlive On\nMaxKeepAliveRequests 100\nKeepAliveTimeout 5\nUser ${APACHE_RUN_USER}\nGroup
+    ${APACHE_RUN_GROUP}\nHostnameLookups Off\nErrorLog ${APACHE_LOG_DIR}/error.log\nLogLevel
+    warn\nIncludeOptional mods-enabled/*.load\nIncludeOptional mods-enabled/*.conf\nInclude
+    ports.conf\n<Directory />\n\tOptions FollowSymLinks\n\tAllowOverride None\n\tRequire
+    all denied\n</Directory>\n\n<Directory /usr/share>\n\tAllowOverride None\n\tRequire
+    all granted\n</Directory>\n\n<Directory /var/www/>\n\tOptions Indexes FollowSymLinks\n\tAllowOverride
+    all\n\tRequire all granted\n</Directory>\n\n\n\n\n\nAccessFileName .htaccess\n\n<FilesMatch
+    \"^\\.ht\">\n\tRequire all denied\n</FilesMatch>\n\n\nLogFormat \"%v:%p %h %l
+    %u %t \\\"%r\\\" %>s %O \\\"%{Referer}i\\\" \\\"%{User-Agent}i\\\"\" vhost_combined\nLogFormat
+    \"%h %l %u %t \\\"%r\\\" %>s %O \\\"%{Referer}i\\\" \\\"%{User-Agent}i\\\"\" combined\nLogFormat
+    \"%h %l %u %t \\\"%r\\\" %>s %O\" common\nLogFormat \"%{Referer}i -> %U\" referer\nLogFormat
+    \"%{User-agent}i\" agent\n\n\nIncludeOptional conf-enabled/*.conf\n\nIncludeOptional
+    sites-enabled/*.conf\n\n"
+kind: ConfigMap
+metadata:
+  name: qrcode-apache2-conf
+  namespace: tools
+---
+apiVersion: v1
+data:
+  environment.php: |-
+    <?php
+    /*
+    |--------------------------------------------------------------------------
+    | DOCKER INSTALLATION
+    |--------------------------------------------------------------------------
+     */
+    $docker_cid = getenv('DOCKER_CID');
+
+    if(is_string($docker_cid)) {
+        define('DATABASE_HOST', Getenv('DATABASE_HOST'));
+        define('DATABASE_PORT', filter_var(Getenv('DATABASE_PORT'), FILTER_VALIDATE_INT));
+        define('DATABASE_NAME', Getenv('DATABASE_NAME'));
+        define('DATABASE_USER', Getenv('DATABASE_USER'));
+        define('DATABASE_PASSWORD', Getenv('DATABASE_PASSWORD'));
+        // This must have a trailing underscore.
+        // Example: qr_
+        define('DATABASE_PREFIX', Getenv('DATABASE_PREFIX'));
+        define('DATABASE_CHARSET', Getenv('DATABASE_CHARSET'));
+    } else {
+        define('DATABASE_HOST', "mariadb.vinicima.com");
+        define('DATABASE_PORT', "3306");
+        define('DATABASE_NAME', "qrcode");
+        define('DATABASE_USER', "qrcode");
+        define('DATABASE_PASSWORD', "11qrcode00");
+        // This must have a trailing underscore.
+        // Example: qr_
+        define('DATABASE_PREFIX', "qrcode");
+        define('DATABASE_CHARSET', "utf8");
+    }
+    /*
+    |--------------------------------------------------------------------------
+    | INSTALLATION WITHOUT CONTAINER
+    |--------------------------------------------------------------------------
+     */
+
+    ?>
+kind: ConfigMap
+metadata:
+  name: qrcode-environment-php
+  namespace: tools
+---
+apiVersion: v1
+data:
+  config.php: "<?php\n\nrequire_once ('environment.php');\n\n//Note: This file should
+    be included first in every php page.\nerror_reporting(E_ALL);\nini_set('display_errors',
+    'On');\ndefine('BASE_PATH', dirname(dirname(__FILE__)));\ndefine('APP_FOLDER',
+    'simpleadmin');\ndefine('CURRENT_PAGE', basename($_SERVER['REQUEST_URI']));\n\n/*
+    PATH OF SAVED QR CODES */\ndefine('PATH', './saved_qrcode/');                              //You
+    can change the folder where the qr code will be saved\ndefine('DIRECTORY', BASE_PATH.'/saved_qrcode/');\n\n//You
+    can change the page name for the redirect and the search parameter (the default
+    is \"id\")\ndefine('READ_PATH', $_SERVER['HTTP_HOST'].'/read.php?id=');     \n\nrequire_once
+    BASE_PATH . '/lib/MysqliDb/MysqliDb.php';\nrequire_once BASE_PATH . '/helpers/helpers.php';\n\n\n/**\n
+    * Get instance of DB object\n */\nfunction getDbInstance() {\n    return new MysqliDb
+    (Array (\n        'host' => DATABASE_HOST,\n        'username' => DATABASE_USER,\n
+    \       'password' => DATABASE_PASSWORD,\n        'db'=> DATABASE_NAME,\n        'port'
+    => DATABASE_PORT,\n        'prefix' => DATABASE_PREFIX,\n        'charset' =>
+    DATABASE_CHARSET));\n}"
+kind: ConfigMap
+metadata:
+  name: qrcode-config-php
+  namespace: tools

@@ -1,0 +1,55 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+  name: unpackerr-trt
+  labels:
+    app: unpackerr-trt
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unpackerr-trt
+  template:
+    metadata:
+      labels:
+        app: unpackerr-trt
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: unpackerr-trt
+        image: ghcr.io/unpackerr/unpackerr:unstable
+        securityContext:
+          privileged: true
+          runAsUser: 10000
+          runAsGroup: 10000 
+        ports:
+        - name: unpackerr-trt
+          containerPort: 5656
+        envFrom:
+        - secretRef:
+            name: unpackerr-trt-secrets
+        volumeMounts:
+        - name: p2p
+          mountPath: /data/p2p/
+      volumes:
+      - name: p2p
+        hostPath:
+          path: /data/p2p/
+          type: Directory
+

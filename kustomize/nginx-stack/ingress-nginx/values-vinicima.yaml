@@ -1,0 +1,21 @@
+controller:
+  replicaCount: 4
+  config:
+    use-forwarded-headers: "true"
+    allowSnippetAnnotations: "true"
+    proxy-set-headers: ""
+    use-forwarded-headers: "true"
+  service:
+    type: LoadBalancer
+    loadBalancerIP: 192.168.253.240
+
+  admissionWebhooks:
+    enabled: true
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi

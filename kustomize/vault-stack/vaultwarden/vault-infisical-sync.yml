@@ -1,0 +1,26 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: vault-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: vault-service-token
+        secretNamespace: vault
+      secretsScope:
+        envSlug: production
+        secretsPath: /vaultwarden
+
+  managedKubeSecretReferences:
+    - secretName: vault-secrets
+      secretNamespace: vault
+      secretType: Opaque
+      template:
+        includeAllSecrets: true
+
+
+

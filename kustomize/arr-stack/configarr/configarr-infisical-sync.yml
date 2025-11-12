@@ -1,0 +1,22 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: configarr-infisical-secret
+  namespace: arr
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: configarr-service-token
+        secretNamespace: arr
+      secretsScope:
+        envSlug: production
+        secretsPath: /configarr
+
+  managedSecretReference:
+    secretName: configarr-secrets
+    secretNamespace: arr
+    secretType: Opaque

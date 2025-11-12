@@ -1,0 +1,66 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jellystat
+  labels:
+    app: jellystat
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jellystat
+  template:
+    metadata:
+      labels:
+        app: jellystat
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aloy
+                - ellie
+                - joel
+      containers:
+      - name: jellystat
+        image: cyfershepard/jellystat:latest
+        ports:
+        - name: jellystat
+          containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: jellystat-secrets
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        volumeMounts:
+        - name: jellystat
+          mountPath: /app/backend/backup-data
+      volumes:
+      - name: jellystat
+        persistentVolumeClaim:
+          claimName: jellystat
+
+

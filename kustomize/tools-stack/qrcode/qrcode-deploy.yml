@@ -1,0 +1,89 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: qrcode
+  labels:
+    app: qrcode
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qrcode
+  template:
+    metadata:
+      labels:
+        app: qrcode
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aloy
+                - ellie
+                - joel
+      containers:
+      - name: qrcode
+        image: docker.io/marcosviniciusi/qrcode-generator:latest
+        resources:
+            limits:
+              memory: 1Gi
+              cpu: 1000m
+            requests:
+              memory: 512Mi
+              cpu: 500m
+        ports:
+        - name: qrcode
+          containerPort: 80
+        envFrom:
+        - secretRef:
+            name: qrcode-secrets
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        volumeMounts:
+        - name: qrcode-saved
+          mountPath: /var/www/html/saved_qrcode
+        - name: qrcode-apache2-conf
+          mountPath: /docker/qrcode/apache2.conf
+          subPath: apache2.conf
+        - name: qrcode-config-php
+          mountPath: /var/www/html/config/config.php
+          subPath: config.php
+        - name: qrcode-environment-php
+          mountPath: /var/www/html/config/environment.php
+          subPath: environment.php
+      volumes:
+      - name: qrcode-saved
+        persistentVolumeClaim:
+          claimName: qrcode-saved
+      - name: qrcode-apache2-conf
+        configMap:
+          name: qrcode-apache2-conf
+      - name: qrcode-config-php
+        configMap:
+          name: qrcode-config-php
+      - name: qrcode-environment-php
+        configMap:
+          name: qrcode-environment-php

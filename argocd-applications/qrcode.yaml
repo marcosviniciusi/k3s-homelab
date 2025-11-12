@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: qrcode
+  namespace: argocd
+spec:
+  destination:
+    namespace: tools
+    server: https://kubernetes.default.svc
+  project: vinicima-prod
+  source:
+    path: kustomize/tools-stack/qrcode
+    repoURL: git@github.com:vinicimatecnologia/k3s-homelab.git
+    targetRevision: main
+  syncPolicy:
+    automated: {}
+

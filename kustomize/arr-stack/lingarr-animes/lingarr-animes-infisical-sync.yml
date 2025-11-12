@@ -1,0 +1,23 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: lingarr-animes-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: lingarr-animes-service-token
+        secretNamespace: arr
+      secretsScope:
+        envSlug: production
+        secretsPath: /lingarr-animes
+
+  managedKubeSecretReferences:
+    - secretName: lingarr-animes-secrets
+      secretNamespace: arr
+      secretType: Opaque
+      template:
+        includeAllSecrets: true

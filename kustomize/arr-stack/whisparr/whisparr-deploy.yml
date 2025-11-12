@@ -1,0 +1,91 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: whisparr
+  labels:
+    app: whisparr
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whisparr
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-dotnet: "true"
+        sidecar.opentelemetry.io/inject: "true"
+      labels:
+        app: whisparr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: whisparr
+        image: ghcr.io/hotio/whisparr:latest
+        resources:
+            limits:
+              memory: 2Gi
+              cpu: 2000m
+            requests:
+              memory: 512Mi
+              cpu: 500m
+        ports:
+        - name: whisparr
+          containerPort: 6969
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 6969
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 6969
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        envFrom:
+        - secretRef:
+            name: whisparr-secrets
+        volumeMounts:
+        - name: whisparr
+          mountPath: /config
+        - name: xxx
+          mountPath: /data/videos/xxx
+        - name: p2p
+          mountPath: /data/p2p/complete/xxx
+        - name: usenet
+          mountPath: /data/usenet/complete/xxx
+      volumes:
+      - name: whisparr
+        hostPath:
+          path: /k8s/whisparr
+          type: Directory
+      - name: xxx
+        hostPath:
+          path: /data2/videos/XXX
+          type: Directory
+      - name: p2p
+        hostPath:
+          path: /data/p2p/complete/xxx
+          type: Directory
+      - name: usenet
+        hostPath:
+          path: /data/usenet/complete/xxx
+          type: Directory

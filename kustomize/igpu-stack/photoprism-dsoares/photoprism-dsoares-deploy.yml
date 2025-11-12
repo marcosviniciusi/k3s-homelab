@@ -1,0 +1,87 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: photo-dsoares
+  labels:
+    app: photo-dsoares
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+    keel.sh/approvals: "1"
+spec:
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: photo-dsoares
+  template:
+    metadata:
+      labels:
+        app: photo-dsoares
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: photo-dsoares
+        image: photoprism/photoprism:latest
+        securityContext:
+          privileged: true
+          runAsUser: 33
+          runAsGroup: 33 
+        ports:
+        - name: photo-dsoares
+          containerPort: 2342
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 2342
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 2342
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        envFrom:
+        - secretRef:
+            name: dsoares-secrets
+        volumeMounts:
+        - name: photo-dsoares
+          mountPath: /photoprism/storage
+        - name: dsoares-fotos
+          mountPath: /photoprism/originals
+        - name: dsoares-import
+          mountPath: /photoprism/import
+        - name: quicksync
+          mountPath: /dev/dri
+      volumes:
+      - name: photo-dsoares
+        hostPath:
+          path: /k8s/photo-dsoares
+          type: Directory
+      - name: dsoares-fotos
+        hostPath:
+          path: /fotos/dsoares
+          type: Directory
+      - name: dsoares-import
+        emptyDir:
+          medium: Memory
+          sizeLimit: 2Gi
+      - name: quicksync
+        hostPath:
+          path: /dev/dri
+
+

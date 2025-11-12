@@ -1,0 +1,96 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: readarr
+  labels:
+    app: readarr
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: readarr
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-dotnet: "true"
+        sidecar.opentelemetry.io/inject: "true"
+      labels:
+        app: readarr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: readarr
+        image: ghcr.io/hotio/readarr:latest
+        resources:
+            limits:
+              memory: 2Gi
+              cpu: 2000m
+            requests:
+              memory: 512Mi
+              cpu: 500m
+        ports:
+        - name: readarr
+          containerPort: 8787
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8787
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8787
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        envFrom:
+        - secretRef:
+            name: readarr-secrets
+        volumeMounts:
+        - name: readarr
+          mountPath: /config
+        - name: ebooks
+          mountPath: /data/ebooks
+        - name: p2p
+          mountPath: /data/p2p/complete/books
+        - name: usenet
+          mountPath: /data/usenet/complete/books
+      initContainers:
+        - name: init-wait-pvc
+          image: busybox:1.28
+          command: ['sh', '-c', "sleep 10"]
+      volumes:
+      - name: readarr
+        hostPath:
+          path: /k8s/readarr
+          type: Directory
+      - name: ebooks
+        hostPath:
+          path: /data/ebooks
+          type: Directory
+      - name: p2p
+        hostPath:
+          path: /data/p2p/complete/books
+          type: Directory
+      - name: usenet
+        hostPath:
+          path: /data/usenet/complete/books
+          type: Directory
+

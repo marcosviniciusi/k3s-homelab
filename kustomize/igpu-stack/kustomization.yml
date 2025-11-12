@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: igpu
+resources:
+  - photoprism-dsoares/photoprism-dsoares-deploy.yml
+  - photoprism-dsoares/photoprism-dsoares-svc.yml
+  - photoprism-dsoares/photoprism-dsoares-pvc.yml
+  - photoprism-ksoares/photoprism-ksoares-deploy.yml
+  - photoprism-ksoares/photoprism-ksoares-svc.yml
+  - photoprism-ksoares/photoprism-ksoares-pvc.yml
+  - photoprism-mgabriel/photoprism-mgabriel-deploy.yml
+  - photoprism-mgabriel/photoprism-mgabriel-svc.yml
+  - photoprism-mgabriel/photoprism-mgabriel-pvc.yml
+  - unmanic/unmanic-deploy.yml
+  - unmanic/unmanic-svc.yml
+  - unmanic/unmanic-pvc.yml
+

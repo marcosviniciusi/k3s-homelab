@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vinicima-certificate
+  namespace: cert-manager
+spec:
+  secretTemplate:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+  secretName: vinicima-com-tls
+  issuerRef:
+    name: cloudflare-dns01-issuer
+    kind: ClusterIssuer
+  commonName: vinicima.com
+  dnsNames:
+  - vinicima.com
+  - '*.vinicima.com'

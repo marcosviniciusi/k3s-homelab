@@ -1,0 +1,132 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: vinicima-prod
+  namespace: argocd
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: ClusterIssuer
+  - group: '*'
+    kind: PriorityClass
+  - group: '*'
+    kind: Namespace
+  - group: '*'
+    kind: ServiceAccount
+  - group: '*'
+    kind: StorageClass
+  - group: '*'
+    kind: CustomResourceDefinition
+  - group: '*'
+    kind: BackingImageDataSource
+  - group: '*'
+    kind: BackingImageManager
+  - group: '*'
+    kind: BackingImage
+  - group: '*'
+    kind: BackupBackingImage
+  - group: '*'
+    kind: Backup
+  - group: '*'
+    kind: BackupTarget
+  - group: '*'
+    kind: BackupVolume
+  - group: '*'
+    kind: EngineImage
+  - group: '*'
+    kind: Engine
+  - group: '*'
+    kind: InstanceManager
+  - group: '*'
+    kind: Node
+  - group: '*'
+    kind: Orphan
+  - group: '*'
+    kind: RecurringJob
+  - group: '*'
+    kind: Replica
+  - group: '*'
+    kind: Setting
+  - group: '*'
+    kind: ShareManager
+  - group: '*'
+    kind: Snapshot
+  - group: '*'
+    kind: SupportBundle
+  - group: '*'
+    kind: SystemBackup
+  - group: '*'
+    kind: SystemRestore
+  - group: '*'
+    kind: VolumeAttachment
+  - group: '*'
+    kind: Volume
+  - group: '*'
+    kind: ClusterRole
+  - group: '*'
+    kind: ClusterRoleBinding
+  - group: '*'
+    kind: ServiceAccount
+  - group: '*'
+    kind: CertificateRequest
+  - group: '*'
+    kind: Certificate
+  - group: '*'
+    kind: Challenge
+  - group: '*'
+    kind: Issuer
+  - group: '*'
+    kind: Order
+  - group: '*'
+    kind: Namespace
+  - group: '*'
+    kind: Role
+  - group: '*'
+    kind: BFDProfile
+  - group: '*'
+    kind: BGPAdvertisement
+  - group: '*'
+    kind: Community
+  - group: '*'
+    kind: IPAddressPool
+  - group: '*'
+    kind: L2Advertisement
+  - group: '*'
+    kind: ServiceBGPStatus
+  - group: '*'
+    kind: ServiceL2Status
+  - group: '*'
+    kind: BGPPeer
+  - group: '*'
+    kind: ValidatingWebhookConfiguration
+  - group: '*'
+    kind: ConfigMap
+  - group: '*'
+    kind: IPAddressPool
+  - group: '*'
+    kind: ' IngressClass'
+  - group: '*'
+    kind: ScaledObject
+  - group: '*'
+    kind: NetworkPolicy
+  - group: '*'
+    kind: PodDisruptionBudget
+  - group: '*'
+    kind: PrometheusRule
+  - group: '*'
+    kind: RoleBinding
+  - group: '*'
+    kind: ServiceMonitor
+  - group: '*'
+    kind: HorizontalPodAutoscaler
+  - group: networking.k8s.io
+    kind: Ingress
+  - group: networking.k8s.io
+    kind: IngressClass
+  destinations:
+  - name: '*'
+    namespace: '*'
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - git@github.com:vinicimatecnologia/k3s-homelab.git
+

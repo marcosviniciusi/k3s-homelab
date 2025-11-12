@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test
+  labels:
+    app.kubernetes.io/instance: uptime-kuma
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/version: 1.23.13
+    helm.sh/chart: uptime-kuma-2.21.3
+  name: uptime-kuma-test-connection
+  namespace: tools
+spec:
+  containers:
+  - args:
+    - uptime-kuma:3001
+    command:
+    - wget
+    image: busybox
+    name: wget
+  restartPolicy: Never

@@ -1,0 +1,56 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: sonarraexporter
+  labels:
+    app: sonarraexporter
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: sonarraexporter
+  template:
+    metadata:
+      labels:
+        app: sonarraexporter
+    spec:
+      containers:
+        - name: sonarraexporter
+          image: ghcr.io/onedr0p/exportarr:v1.5.3
+          imagePullPolicy: IfNotPresent
+          args:
+            - sonarr
+          envFrom:
+          - secretRef:
+              name: sonarrasecrets
+          ports:
+            - name: sonarramonit
+              containerPort: 9707
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9707
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9707
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi

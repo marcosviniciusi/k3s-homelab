@@ -1,0 +1,26 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: radarr-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: radarr-service-token
+        secretNamespace: tools
+      secretsScope:
+        envSlug: production
+        secretsPath: /radarr
+
+  managedKubeSecretReferences:
+    - secretName: radarr-secrets
+      secretNamespace: tools
+      secretType: Opaque
+      template:
+        includeAllSecrets: true
+
+
+

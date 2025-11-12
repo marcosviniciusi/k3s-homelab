@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: sonarraexporter
+  labels:
+    app.kubernetes.io/name: sonarraexporter
+    app.kubernetes.io/instance: sonarraexporter
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sonarraexporter
+      app.kubernetes.io/instance: sonarraexporter
+  endpoints:
+    - port: sonarramonitoring
+      interval: 4m
+      scrapeTimeout: 90s
+      path: /metrics

@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kube-system
+resources:
+  - sealedsecret.yaml
+  - keel-deploy.yaml
+  - keel-infisical-sync.yml
+  - keel-ingress.yaml
+  - keel-rbac-clusterrole.yaml
+  - keel-rbac-clusterrolebinding.yaml
+  - keel-serviceaccount.yaml
+  - keel-svc.yml

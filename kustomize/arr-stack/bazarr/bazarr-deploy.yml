@@ -1,0 +1,83 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: bazarr
+  labels:
+    app: bazarr
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bazarr
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-dotnet: "true"
+        sidecar.opentelemetry.io/inject: "true"
+      labels:
+        app: bazarr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: bazarr
+        image: ghcr.io/hotio/bazarr:latest
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        ports:
+        - name: bazarr
+          containerPort: 6767
+        envFrom:
+        - secretRef:
+            name: bazarr-secrets
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 6767
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 6767
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        volumeMounts:
+        - name: bazarr
+          mountPath: /config
+        - name: movies
+          mountPath: /data/videos/movies
+        - name: series
+          mountPath: /data/videos/series
+      volumes:
+      - name: bazarr
+        hostPath:
+          path: /k8s/bazarr
+          type: Directory
+      - name: movies
+        hostPath:
+          path: /data/videos/movies
+          type: Directory
+      - name: series
+        hostPath:
+          path: /data2/videos/series
+          type: Directory
+

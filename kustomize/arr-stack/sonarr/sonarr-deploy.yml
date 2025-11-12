@@ -1,0 +1,91 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: sonarr
+  labels:
+    app: sonarr
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarr
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-dotnet: "true"
+        sidecar.opentelemetry.io/inject: "true"
+      labels:
+        app: sonarr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: sonarr
+        image: ghcr.io/hotio/sonarr:latest
+        ports:
+        - name: sonarr
+          containerPort: 8989
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8989
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8989
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        envFrom:
+        - secretRef:
+            name: sonarr-secrets
+        volumeMounts:
+        - name: sonarr
+          mountPath: /config
+        - name: series
+          mountPath: /data/videos/series
+        - name: p2p
+          mountPath: /data/p2p/complete/tv
+        - name: cold
+          mountPath: /data/p2p/cold
+        - name: usenet
+          mountPath: /data/usenet/complete/tv
+      volumes:
+      - name: sonarr
+        hostPath:
+          path: /k8s/sonarr
+          type: Directory
+      - name: series
+        hostPath:
+          path: /data2/videos/series
+          type: Directory
+      - name: p2p
+        hostPath:
+          path: /data/p2p/complete/tv
+          type: Directory
+      - name: cold
+        hostPath:
+          path: /data/p2p/cold
+          type: Directory
+      - name: usenet
+        hostPath:
+          path: /data/usenet/complete/tv
+          type: Directory
+

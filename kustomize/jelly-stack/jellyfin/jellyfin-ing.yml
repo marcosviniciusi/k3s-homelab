@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jellyfin
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"                # Redireciona HTTP para HTTPS
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"          # Garante o redirect SSL
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"              # Limite de tamanho de upload (ajuste conforme o app)
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"          # Timeout maior para apps que demoram pra responder
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"   # Força uso de ciphers mais seguros
+    nginx.ingress.kubernetes.io/use-regex: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - jelly-k8s.vinicima.com
+      secretName: vinicima.com-tls
+  rules:
+    - host: jelly-k8s.vinicima.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jellyfin
+                port:
+                  number: 8096

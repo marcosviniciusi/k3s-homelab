@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress-nginx
+  namespace: argocd
+spec:
+  destination:
+    namespace: ingress-nginx
+    server: https://kubernetes.default.svc
+  project: vinicima-prod
+  source:
+    helm:
+      valueFiles:
+      - values-vinicima.yaml
+    path: kustomize/nginx-stack/ingress-nginx
+    repoURL: git@github.com:vinicimatecnologia/k3s-homelab.git
+    targetRevision: main

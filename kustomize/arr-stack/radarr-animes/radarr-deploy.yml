@@ -1,0 +1,90 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: radarr-animes
+  labels:
+    app: radarr-animes
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: radarr-animes
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-dotnet: "true"
+        sidecar.opentelemetry.io/inject: "true"
+      labels:
+        app: radarr-animes
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: radarr-animes
+        image: ghcr.io/hotio/radarr:latest
+        ports:
+        - name: radarr-animes
+          containerPort: 7878
+        envFrom:
+        - secretRef:
+            name: radarr-animes-secrets
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 7878
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 7878
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        volumeMounts:
+        - name: radarr-animes
+          mountPath: /config
+        - name: animes-movies
+          mountPath: /data/videos/animes-movies
+        - name: p2p
+          mountPath: /data/p2p/complete/animes-movies
+        - name: cold
+          mountPath: /data/p2p/cold
+        - name: usenet
+          mountPath: /data/usenet/complete/animes-movies
+      volumes:
+      - name: radarr-animes
+        hostPath:
+          path: /k8s/radarr-animes
+          type: Directory
+      - name: animes-movies
+        hostPath:
+          path: /data/videos/animes-movies
+          type: Directory
+      - name: p2p
+        hostPath:
+          path: /data/p2p/complete/animes-movies
+          type: Directory
+      - name: cold
+        hostPath:
+          path: /data/p2p/cold
+          type: Directory
+      - name: usenet
+        hostPath:
+          path: /data/usenet/complete/animes-movies
+          type: Directory

@@ -1,0 +1,83 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: bazarr-animes
+  labels:
+    app: bazarr-animes
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bazarr-animes
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-dotnet: "true"
+        sidecar.opentelemetry.io/inject: "true"
+      labels:
+        app: bazarr-animes
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: bazarr-animes
+        image: ghcr.io/hotio/bazarr:latest
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        ports:
+        - name: bazarr-animes
+          containerPort: 6767
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 6767
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 6767
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        envFrom:
+        - secretRef:
+            name: bazarr-animes-secrets
+        volumeMounts:
+        - name: bazarr-animes
+          mountPath: /config
+        - name: animes-movies
+          mountPath: /data/videos/animes-movies
+        - name: animes-series
+          mountPath: /data/videos/animes
+      volumes:
+      - name: bazarr-animes
+        hostPath:
+          path: /k8s/bazarr-animes
+          type: Directory
+      - name: animes-movies
+        hostPath:
+          path: /data/videos/animes-movies
+          type: Directory
+      - name: animes-series
+        hostPath:
+          path: /data2/videos/animes
+          type: Directory
+

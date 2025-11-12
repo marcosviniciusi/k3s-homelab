@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: unpackerr-trt
+spec:
+  selector:
+    app: unpackerr-trt
+  type: ClusterIP
+  ports:
+    - port: 7878
+      targetPort: unpackerr-trt

@@ -1,0 +1,91 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: prowlarr
+  labels:
+    app: prowlarr
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prowlarr
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-dotnet: "true"
+        sidecar.opentelemetry.io/inject: "true"
+      labels:
+        app: prowlarr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: prowlarr
+        image: ghcr.io/hotio/prowlarr:latest
+        resources:
+            limits:
+              memory: 2Gi
+              cpu: 2000m
+            requests:
+              memory: 1Gi
+              cpu: 1000m
+        ports:
+        - name: prowlarr
+          containerPort: 9696
+        envFrom:
+        - secretRef:
+            name: prowlarr-secrets
+        volumeMounts:
+        - name: prowlarr
+          mountPath: /config
+        - name: data
+          mountPath: /data/
+        - name: p2p
+          mountPath: /data/p2p/complete/prowlarr
+        - name: usenet
+          mountPath: /data/usenet/complete/prowlarr
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9696
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9696
+          initialDelaySeconds: 10
+          periodSeconds: 15
+      volumes:
+      - name: prowlarr
+        hostPath:
+          path: /k8s/prowlarr
+          type: Directory
+      - name: data
+        hostPath:
+          path: /data/
+          type: Directory
+      - name: p2p
+        hostPath:
+          path: /data/p2p/complete/prowlarr
+          type: Directory
+      - name: usenet
+        hostPath:
+          path: /data/usenet/complete/prowlarr
+          type: Directory

@@ -1,0 +1,87 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: photo-mgabriel
+  labels:
+    app: photo-mgabriel
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+    keel.sh/approvals: "1"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: photo-mgabriel
+  template:
+    metadata:
+      labels:
+        app: photo-mgabriel
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: photo-mgabriel
+        image: photoprism/photoprism:latest
+        securityContext:
+          privileged: true
+          runAsUser: 33
+          runAsGroup: 33 
+        ports:
+        - name: photo-mgabriel
+          containerPort: 2342
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 2342
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 2342
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        envFrom:
+        - secretRef:
+            name: mgabriel-secrets
+        volumeMounts:
+        - name: photo-mgabriel
+          mountPath: /photoprism/storage
+        - name: mgabriel-fotos
+          mountPath: /photoprism/originals
+        - name: mgabriel-import
+          mountPath: /photoprism/import
+        - name: quicksync
+          mountPath: /dev/dri
+      volumes:
+      - name: photo-mgabriel
+        hostPath:
+          path: /k8s/photo-mgabriel
+          type: Directory
+      - name: mgabriel-fotos
+        hostPath:
+          path: /fotos/mgabriel
+          type: Directory
+      - name: mgabriel-import
+        emptyDir:
+          medium: Memory
+          sizeLimit: 2Gi
+      - name: quicksync
+        hostPath:
+          path: /dev/dri
+
+

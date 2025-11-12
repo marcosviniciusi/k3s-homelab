@@ -1,0 +1,51 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: dashy
+  labels:
+    app: dashy
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashy
+  template:
+    metadata:
+      labels:
+        app: dashy
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - eloy
+                - ellie
+                - joel
+      containers:
+      - name: dashy
+        image: lissy93/dashy:latest
+        ports:
+        - name: dashy
+          containerPort: 8080
+        env:
+        - name: TZ
+          value: "America/Sao_Paulo"
+        volumeMounts:
+        - name: dashy
+          mountPath: /app/user-data
+      volumes:
+      - name: dashy
+        persistentVolumeClaim:
+          claimName: dashy
+
+

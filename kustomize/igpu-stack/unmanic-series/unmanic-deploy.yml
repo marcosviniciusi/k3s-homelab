@@ -1,0 +1,77 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: unmanic-series
+  labels:
+    app: unmanic-series
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+    keel.sh/approvals: "1"    
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unmanic-series
+  template:
+    metadata:
+      labels:
+        app: unmanic-series
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - joel
+      containers:
+      - name: unmanic-series
+        image: josh5/unmanic:latest
+        ports:
+        - name: unmanic-series
+          containerPort: 8888
+        env:
+        - name: PUID
+          value: "10000"
+        - name: PGID
+          value: "10000"
+        - name: TZ
+          value: "America/Sao_Paulo"
+        resources:
+          limits:
+            gpu.intel.com/i915: "5"
+        volumeMounts:
+        - name: unmanic-series
+          mountPath: /config
+        - name: nfs-series
+          mountPath: /data/videos/series
+        - name: nfs-animes
+          mountPath: /data/videos/animes
+        - name: unmanic-series-transcode
+          mountPath: /tmp/unmanic
+      volumes:
+      - name: unmanic-series
+        persistentVolumeClaim:
+          claimName: unmanic-series
+      - name: nfs-series
+        nfs:
+          server: 192.168.253.250
+          path: /export/data2/videos/series
+      - name: nfs-animes
+        nfs:
+          server: 192.168.253.250
+          path: /export/data2/videos/animes
+      - name: unmanic-series-transcode
+        emptyDir:
+          medium: Memory
+          sizeLimit: 24Gi
+
+

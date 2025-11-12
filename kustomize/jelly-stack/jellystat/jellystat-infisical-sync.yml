@@ -1,0 +1,26 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: jellystat-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: jellystat-service-token
+        secretNamespace: jelly
+      secretsScope:
+        envSlug: production
+        secretsPath: /jellystat
+
+  managedKubeSecretReferences:
+    - secretName: jellystat-secrets
+      secretNamespace: jelly
+      secretType: Opaque
+      template:
+        includeAllSecrets: true
+
+
+

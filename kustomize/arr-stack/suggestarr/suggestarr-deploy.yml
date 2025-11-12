@@ -1,0 +1,75 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: suggestarr
+  labels:
+    app: suggestarr
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+    keel.sh/approvals: "1"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: suggestarr
+  template:
+    metadata:
+      labels:
+        app: suggestarr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - eloy
+                - joel
+                - ellie
+      containers:
+      - name: suggestarr
+        image: ciuse99/suggestarr:latest
+        resources:
+            limits:
+              memory: 2Gi
+              cpu: 2000m
+            requests:
+              memory: 512Mi
+              cpu: 500m  
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        ports:
+        - name: suggestarr
+          containerPort: 5000
+        env:
+        - name: TZ
+          value: "America/Sao_Paulo"
+        - name: SUGGESTARR_PORT
+          value: "5000"
+        volumeMounts:
+        - name: suggestarr
+          mountPath: /app/config/config_files
+      volumes:
+      - name: suggestarr
+        persistentVolumeClaim:
+          claimName: suggestarr
+

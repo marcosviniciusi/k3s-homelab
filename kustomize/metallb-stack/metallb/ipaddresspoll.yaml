@@ -1,0 +1,7 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: vinicima-pool
+spec:
+  addresses:
+  - 192.168.253.10-192.168.253.245

@@ -1,0 +1,75 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: overseerr
+  labels:
+    app: overseerr
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: overseerr
+  template:
+    metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-nodejs: "true"
+        sidecar.opentelemetry.io/inject: "true"
+      labels:
+        app: overseerr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aloy
+                - ellie
+                - joel
+      containers:
+      - name: overseerr
+        image: ghcr.io/hotio/jellyseerr:latest
+        resources:
+            limits:
+              memory: 4Gi
+              cpu: 2000m
+            requests:
+              memory: 512Mi
+              cpu: 500m
+        ports:
+        - name: overseerr
+          containerPort: 5055
+        envFrom:
+        - secretRef:
+            name: overseerr-secrets
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5055
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5055
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        volumeMounts:
+        - name: overseerr
+          mountPath: /app/config
+      volumes:
+      - name:  overseerr
+        persistentVolumeClaim:
+          claimName:  overseerr
+

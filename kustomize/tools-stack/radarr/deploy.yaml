@@ -1,0 +1,56 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: radarr-exporter
+  labels:
+    app: radarr-exporter
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: radarr-exporter
+  template:
+    metadata:
+      labels:
+        app: radarr-exporter
+    spec:
+      containers:
+        - name: radarr-exporter
+          image: ghcr.io/onedr0p/exportarr:v1.5.3
+          imagePullPolicy: IfNotPresent
+          args:
+            - radarr
+          envFrom:
+          - secretRef:
+              name: radarr-secrets
+          ports:
+            - name: radarr-monit
+              containerPort: 9707
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9707
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9707
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi

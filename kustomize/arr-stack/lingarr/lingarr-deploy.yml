@@ -1,0 +1,81 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: lingarr
+  labels:
+    app: lingarr
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lingarr
+  template:
+    metadata:
+      labels:
+        app: lingarr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aloy
+                - ellie
+                - joel
+      containers:
+      - name: lingarr
+        image: lingarr/lingarr:latest
+        resources:
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        ports:
+        - name: lingarr
+          containerPort: 9876
+        envFrom:
+        - secretRef:
+            name: lingarr-secrets
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9876
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9876
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        volumeMounts:
+        - name: lingarr
+          mountPath: /app/config
+        - name: nfs-movies
+          mountPath: /data/videos/movies
+        - name: nfs-series
+          mountPath: /data/videos/series
+      volumes:
+      - name: lingarr
+        persistentVolumeClaim:
+          claimName: lingarr
+      - name: nfs-movies
+        nfs:
+          server: 192.168.253.250
+          path: /export/data/videos/movies
+      - name: nfs-series
+        nfs:
+          server: 192.168.253.250
+          path: /export/data2/videos/series
+
