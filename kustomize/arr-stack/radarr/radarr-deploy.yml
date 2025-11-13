@@ -47,27 +47,9 @@ spec:
         ports:
         - name: radarr
           containerPort: 7878
-        env:
-        - name: PUID
-          value: "10000"
-        - name: PGID
-          value: "10000"
-        - name: TZ
-          value: "America/Sao_Paulo"
-        - name: RADARR__LOG__DBENABLED
-          value: "true"
-        - name: RADARR__POSTGRES__HOST
-          value: postgres.vinicima.com
-        - name: RADARR__POSTGRES__PORT
-          value: "5432"
-        - name: RADARR__POSTGRES__USER
-          value: radarr
-        - name: RADARR__POSTGRES__PASSWORD
-          value: 3eowzXSFfyapQySKb59mLHTrX9kRL7
-        - name: RADARR__POSTGRES__MAINDB
-          value: radarr_maindb
-        - name: RADARR__POSTGRES__LOGDB
-          value: radarr_logdb
+        envFrom:
+        - secretRef:
+            name: radarr-secrets
         livenessProbe:
           httpGet:
             path: /
