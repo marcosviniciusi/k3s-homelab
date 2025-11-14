@@ -19,49 +19,28 @@ metadata:
   name: qrcode-apache2-conf
   namespace: tools
 ---
+# ConfigMap atualizado - sem credenciais hardcoded
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qrcode-environment-php
+  namespace: tools
 data:
   environment.php: |-
     <?php
     /*
     |--------------------------------------------------------------------------
-    | DOCKER INSTALLATION
+    | USANDO VARIÁVEIS DE AMBIENTE DO INFISICAL
     |--------------------------------------------------------------------------
      */
-    $docker_cid = getenv('DOCKER_CID');
-
-    if(is_string($docker_cid)) {
-        define('DATABASE_HOST', Getenv('DATABASE_HOST'));
-        define('DATABASE_PORT', filter_var(Getenv('DATABASE_PORT'), FILTER_VALIDATE_INT));
-        define('DATABASE_NAME', Getenv('DATABASE_NAME'));
-        define('DATABASE_USER', Getenv('DATABASE_USER'));
-        define('DATABASE_PASSWORD', Getenv('DATABASE_PASSWORD'));
-        // This must have a trailing underscore.
-        // Example: qr_
-        define('DATABASE_PREFIX', Getenv('DATABASE_PREFIX'));
-        define('DATABASE_CHARSET', Getenv('DATABASE_CHARSET'));
-    } else {
-        define('DATABASE_HOST', "mariadb.vinicima.com");
-        define('DATABASE_PORT', "3306");
-        define('DATABASE_NAME', "qrcode");
-        define('DATABASE_USER', "qrcode");
-        define('DATABASE_PASSWORD', "11qrcode00");
-        // This must have a trailing underscore.
-        // Example: qr_
-        define('DATABASE_PREFIX', "qrcode");
-        define('DATABASE_CHARSET', "utf8");
-    }
-    /*
-    |--------------------------------------------------------------------------
-    | INSTALLATION WITHOUT CONTAINER
-    |--------------------------------------------------------------------------
-     */
-
+    define('DATABASE_HOST', getenv('DATABASE_HOST'));
+    define('DATABASE_PORT', filter_var(getenv('DATABASE_PORT'), FILTER_VALIDATE_INT));
+    define('DATABASE_NAME', getenv('DATABASE_NAME'));
+    define('DATABASE_USER', getenv('DATABASE_USER'));
+    define('DATABASE_PASSWORD', getenv('DATABASE_PASSWORD'));
+    define('DATABASE_PREFIX', getenv('DATABASE_PREFIX'));
+    define('DATABASE_CHARSET', getenv('DATABASE_CHARSET'));
     ?>
-kind: ConfigMap
-metadata:
-  name: qrcode-environment-php
-  namespace: tools
 ---
 apiVersion: v1
 data:

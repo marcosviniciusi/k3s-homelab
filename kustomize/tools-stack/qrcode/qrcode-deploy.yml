@@ -2,6 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: qrcode
+  namespace: tools
   labels:
     app: qrcode
   annotations:
@@ -22,6 +23,24 @@ spec:
       labels:
         app: qrcode
     spec:
+      # InitContainer para corrigir permissões
+      initContainers:
+      - name: fix-permissions
+        image: busybox:latest
+        command:
+        - sh
+        - -c
+        - |
+          echo "Fixing permissions on /var/www/html/saved_qrcode..."
+          chown -R 33:33 /var/www/html/saved_qrcode
+          chmod -R 777 /var/www/html/saved_qrcode
+          ls -la /var/www/html/saved_qrcode
+        volumeMounts:
+        - name: qrcode-saved
+          mountPath: /var/www/html/saved_qrcode
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -36,13 +55,17 @@ spec:
       containers:
       - name: qrcode
         image: docker.io/marcosviniciusi/qrcode-generator:latest
+        # Roda como www-data (UID 33)
+        securityContext:
+          runAsUser: 33
+          runAsGroup: 33
         resources:
-            limits:
-              memory: 1Gi
-              cpu: 1000m
-            requests:
-              memory: 512Mi
-              cpu: 500m
+          limits:
+            memory: 1Gi
+            cpu: 1000m
+          requests:
+            memory: 512Mi
+            cpu: 500m
         ports:
         - name: qrcode
           containerPort: 80
