@@ -5,5 +5,5 @@ resources:
   - infisical-sync.yaml
   - deploy.yaml
   - sealedsecret.yaml
-  - service-monitor.yaml
+  #- service-monitor.yaml
   - svc.yaml

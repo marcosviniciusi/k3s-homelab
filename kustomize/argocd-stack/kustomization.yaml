@@ -4,3 +4,4 @@ namespace: argocd
 resources:
   - ingressroute.yaml
   - serverstransport.yaml
+  - servicemonitors.yaml
