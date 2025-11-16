@@ -115,7 +115,7 @@ postgresql:
     # -- Database username for PostgreSQL
     username: infisical
     # -- Password for PostgreSQL database access
-    password: EXAf6JO7f0Kjw8exY4
+    password: 
     # -- Database name for Infisical
     database: infisicalDB
 
@@ -145,7 +145,7 @@ redis:
 
   auth:
     # -- Redis password
-    password: "P7RYXV5IdE6kLoH2dB"
+    password: ""
 
   # -- Redis deployment type (e.g., standalone or cluster)
   architecture: standalone

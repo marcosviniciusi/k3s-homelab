@@ -1,9 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: arr
-resources:
-  - bazarr-deploy.yml
-  - bazarr-svc.yml
-  - sealedsecret.yaml
-  - bazarr-infisical-sync.yml
-  - bazarr-middleware.yml

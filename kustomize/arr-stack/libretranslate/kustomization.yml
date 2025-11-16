@@ -1,9 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: arr
-resources:
-  - libretranslate-deploy.yaml
-  - libretranslate-svc.yaml
-  - libretranslate-configmap.yaml
-  - libretranslate-pvc.yml
-  - libretranslate-middleware.yaml

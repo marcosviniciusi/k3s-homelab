@@ -1,9 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: igpu
-resources:
-  - photoprism-dsoares-deploy.yml
-  - photoprism-dsoares-svc.yml
-  - sealedsecret.yaml
-  - photoprism-dsoares-infisical-sync.yml
-  - photoprism-dsoares-middleware.yml

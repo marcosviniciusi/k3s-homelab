@@ -1,9 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: arr
-resources:
-  - whisparr-deploy.yml
-  - whisparr-svc.yml
-  - whisparr-infisical-sync.yml
-  - sealedsecret.yaml
-  - whisparr-middleware.yaml
