@@ -18,8 +18,10 @@ Este repositório contém todos os manifestos Kubernetes para deploy e gerenciam
     └── NAMESPACE                    # namespaces
         └── <app-name>/              # Pasta da App e seus manifestos
             ├── kustomization.yaml
-            ├── deployment.yaml
-            ├── service.yaml
+            ├── deploy.yaml
+            ├── svc.yaml
+            ├── pvc.yaml
+            ├── infisical-sync.yaml  # infisical Operator
             ├── configmap.yaml
             ├── sealed-secret.yaml
             ├── ingressroute.yaml    # Roteamento Traefik (IngressRoute)
@@ -74,7 +76,7 @@ Suite completa de aplicações *arr para automação de mídia
 - **Huntarr**: Gerenciamento de solicitações e busca
 - **Suggestarr**: Sugestões personalizadas de conteúdo
 - **Unpackerr-TRT**: Extração automática de arquivos torrent
-- **Configarr-Sync**: Sincronização de configurações entre instâncias
+- **Configarr-Sync**: Sincronização de configurações entre instâncias Radarr/Sonarr
 
 ### 🎬 Media Server Stack (Namespace: `jelly`)
 Servidores de mídia e gestão de solicitações
@@ -97,7 +99,7 @@ Gerenciamento de certificados e secrets
 
 ### 🔑 Secrets Management
 - **Infisical Operator** (Namespace: `infisical-operator`): Operador para gerenciamento de secrets
-- **Vault** (Namespace: `vault`): HashiCorp Vault para secrets management
+- **Vault** (Namespace: `vault`): Vaultwarden - Gerenciador de senhas
 - **Linkwarden** (Namespace: `vault`): Gerenciador de bookmarks e links
 
 ### 🌐 Networking & Ingress
