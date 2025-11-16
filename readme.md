@@ -7,7 +7,6 @@ Repositório GitOps para gerenciamento de aplicações do homelab utilizando **A
 Este repositório contém todos os manifestos Kubernetes para deploy e gerenciamento das aplicações do homelab através de práticas GitOps. A estrutura utiliza ArgoCD como ferramenta de Continuous Delivery, permitindo sincronização automática entre o estado desejado (Git) e o estado real do cluster.
 
 ## 🗂️ Estrutura do Repositório
-
 ```
 .
 ├── argocd-projects/                 # Definições de Projects do ArgoCD
@@ -22,7 +21,9 @@ Este repositório contém todos os manifestos Kubernetes para deploy e gerenciam
             ├── deployment.yaml
             ├── service.yaml
             ├── configmap.yaml
-            └── sealed-secret.yaml
+            ├── sealed-secret.yaml
+            ├── ingressroute.yaml    # Roteamento Traefik (IngressRoute)
+            └── middleware.yaml      # Middlewares Traefik (opcional)
 ```
 
 ## 🚀 Como Funciona
@@ -57,7 +58,7 @@ O **Kustomize** é utilizado para gerenciar configurações sem templates, permi
 
 ### 🎯 ArgoCD (Namespace: `argocd`)
 GitOps Continuous Delivery tool para Kubernetes
-- **argocd**: Argo Cd
+- **argocd**: Gerencia o estado das aplicações
 
 ### 📺 Media Automation Stack (Namespace: `arr`)
 Suite completa de aplicações *arr para automação de mídia
@@ -91,8 +92,6 @@ Aplicações que utilizam aceleração de GPU Intel
 ### 🔐 Security & Secrets (Namespace: `cert-manager`, `kube-system`)
 Gerenciamento de certificados e secrets
 - **cert-manager**: Gerenciamento automático de certificados TLS
-- **cert-manager-cainjector**: Injeção de CA em recursos
-- **cert-manager-webhook**: Webhooks para validação
 - **Reflector**: Replicação de secrets e configmaps entre namespaces
 - **sealed-secrets-controller**: Criptografia de secrets no Git
 
@@ -102,7 +101,11 @@ Gerenciamento de certificados e secrets
 - **Linkwarden** (Namespace: `vault`): Gerenciador de bookmarks e links
 
 ### 🌐 Networking & Ingress
-- **Ingress Nginx Controller** (Namespace: `ingress-nginx`): Controlador de ingress com 4 réplicas
+- **Traefik** (Namespace: `traefik`): Ingress Controller moderno com suporte a CRDs nativos
+  - **IngressRoute**: Recursos customizados para roteamento HTTP/HTTPS
+  - **Middlewares**: Autenticação, rate limiting, body size, timeouts
+  - **ServersTransport**: Configurações de backend (HTTPS, timeouts)
+  - **DaemonSet**: Instância em cada node para alta disponibilidade
 - **MetalLB** (Namespace: `metallb-system`): Load balancer para bare-metal
 - **Calico CNI** (Namespaces: `calico-system`, `calico-apiserver`): Network plugin
 
@@ -111,7 +114,7 @@ Gerenciamento de certificados e secrets
 
 ### 🖥️ GPU & Hardware
 - **Intel Device Plugins GPU** (Namespace: `intel-device-plugins-gpu`): Plugin para GPUs Intel
-  - **intel-gpu-plugin**: DaemonSet em 3 nós com GPU
+  - **intel-gpu-plugin**: DaemonSet
   - **inteldeviceplugins-controller-manager**: Gerenciador de dispositivos
 - **Node Feature Discovery** (Namespace: `node-feature-discovery`): Detecção de features de hardware
 
@@ -127,15 +130,12 @@ Exporters Prometheus para monitoramento das aplicações
 
 ### ⚙️ Core System (Namespace: `kube-system`)
 Componentes essenciais do Kubernetes
-- **CoreDNS**: DNS cluster com 3 réplicas
 - **Metrics Server**: Métricas de recursos do cluster
-- **Local Path Provisioner**: Provisionador de storage local
-- **Kube-VIP**: Virtual IP para alta disponibilidade
 - **Keel**: Automação de atualizações de containers
 
 ### 🔧 Operators
 - **Tigera Operator** (Namespace: `tigera-operator`): Operador para Calico
-- **Infisical Secrets Operator**: Operador de secrets com 3 réplicas
+- **Infisical Secrets Operator**: Operador de secrets
 
 ## 🏗️ Infraestrutura do Cluster
 
@@ -144,13 +144,13 @@ Componentes essenciais do Kubernetes
 - **Nós**: 4 nodes bare-metal
 - **CNI**: Calico
 - **Storage**: Longhorn (distribuído)
-- **Load Balancer**: MetalLB
-- **Ingress**: Nginx Ingress Controller
+- **Load Balancer**: MetalLB (IP fixo: 192.168.253.11)
+- **Ingress**: Traefik (v3.6) como DaemonSet
 - **GPU**: Intel GPU device plugin (3 nós)
 
 ### High Availability
 - **ArgoCD**: Controllers redundantes
-- **Ingress**: 4 réplicas do nginx controller
+- **Traefik**: DaemonSet em todos os nós
 - **CoreDNS**: 3 réplicas para DNS redundante
 - **Calico**: HA com Typha e múltiplos controladores
 - **Longhorn**: Storage replicado entre nós
@@ -173,6 +173,7 @@ Componentes essenciais do Kubernetes
 - Calico CNI configurado
 - Longhorn storage instalado
 - MetalLB configurado
+- Traefik CRDs instalados
 - Intel GPU device plugin (para nós com GPU)
 
 ## 📝 Como Usar
@@ -180,29 +181,64 @@ Componentes essenciais do Kubernetes
 ### Adicionar Nova Aplicação
 
 1. Criar manifests em `kustomize/<namespace>/<app-name>/`
-   ```bash
+```bash
    mkdir -p kustomize/<namespace>/<app-name>
    cd kustomize/<namespace>/<app-name>
-   ```
+```
 
 2. Criar arquivos necessários:
    - `kustomization.yaml`
-   - `deployment.yaml`
-   - `service.yaml`
+   - `deploy.yaml`
+   - `svc.yaml`
+   - `pvc.yaml`
+   - `infisical-sync.yaml` ( se necessário - Operator infisical)
+   - `ingressroute.yaml` (se necessário - para expor via HTTPS)
+   - `middleware.yaml` (opcional - para configurações avançadas)
    - `configmap.yaml` (opcional)
    - `sealed-secret.yaml` (se necessário)
 
-3. Criar Application do ArgoCD em `argocd-applications/`
+3. Exemplo de IngressRoute básico:
+```yaml
+   apiVersion: traefik.io/v1alpha1
+   kind: IngressRoute
+   metadata:
+     name: app-name
+     namespace: namespace
+   spec:
+     entryPoints:
+       - websecure
+     routes:
+       - match: Host(`app.vinicima.com`)
+         kind: Rule
+         services:
+           - name: app-name
+             port: 80
+     tls:
+       secretName: vinicima-com-tls
+```
 
-4. Commit e push das alterações
-   ```bash
+4. Exemplo de Middleware (opcional):
+```yaml
+   apiVersion: traefik.io/v1alpha1
+   kind: Middleware
+   metadata:
+     name: app-auth
+     namespace: namespace
+   spec:
+     basicAuth:
+       secret: app-auth-secret
+```
+
+5. Criar Application do ArgoCD em `argocd-applications/`
+
+6. Commit e push das alterações
+```bash
    git add .
    git commit -m "Add: nova aplicação <app-name>"
    git push origin main
-   ```
+```
 
 ### Sincronizar Aplicações
-
 ```bash
 # Sincronizar todas as aplicações
 argocd app sync -l argocd.argoproj.io/instance=<app-name>
@@ -215,7 +251,6 @@ argocd app sync <app-name> --prune --force
 ```
 
 ### Verificar Status
-
 ```bash
 # Listar todas as aplicações
 argocd app list
@@ -231,7 +266,6 @@ argocd app history <app-name>
 ```
 
 ### Gerenciar Namespaces
-
 ```bash
 # Listar pods por namespace
 kubectl get pods -n <namespace>
@@ -243,10 +277,23 @@ kubectl get all -n <namespace>
 kubectl describe pod <pod-name> -n <namespace>
 ```
 
+### Verificar Rotas do Traefik
+```bash
+# Listar IngressRoutes
+kubectl get ingressroute -A
+
+# Ver middlewares
+kubectl get middleware -A
+
+# Acessar dashboard do Traefik
+https://dashboard.vinicima.com
+# ou
+https://dashboard-k8s.vinicima.com
+```
+
 ## 🔐 Gestão de Secrets
 
 Secrets sensíveis são criptografados usando **Sealed Secrets** antes de serem commitados no Git:
-
 ```bash
 # Criar sealed secret
 kubectl create secret generic <secret-name> \
@@ -273,8 +320,19 @@ Todos os exporters estão disponíveis no namespace `tools`:
 - Integração com stack de observabilidade (Prometheus, Grafana, Loki)
 - Logs centralizados de todas as aplicações
 - Métricas de recursos via Metrics Server
+- Dashboard do Traefik para visualização de rotas e middlewares
 
 ## 🎯 Funcionalidades Especiais
+
+### Traefik Features
+- **Virtual Hosts**: Todas as aplicações compartilham o mesmo IP (192.168.253.11)
+- **TLS Automático**: Redirecionamento HTTP → HTTPS configurado globalmente
+- **Middlewares Compartilhados**: 
+  - `body-size-50m`: Permite uploads de até 50MB
+  - `body-size-10g`: Para aplicações específicas (ex: Longhorn)
+  - Basic Auth: Proteção de dashboards administrativos
+- **Backend HTTPS**: Suporte nativo para backends HTTPS (ex: ArgoCD)
+- **Cross-Namespace**: Middlewares compartilhados entre namespaces
 
 ### Automação de Mídia
 - **Configurações Sincronizadas**: Configarr-Sync mantém consistência entre instâncias
@@ -291,6 +349,7 @@ Todos os exporters estão disponíveis no namespace `tools`:
 - Storage replicado via Longhorn
 - Múltiplas réplicas de componentes críticos
 - Load balancing via MetalLB
+- Traefik como DaemonSet (instância em cada nó)
 - Backup automatizado de volumes
 
 ## 🔧 Troubleshooting
@@ -319,6 +378,24 @@ argocd app logs <app-name>
 argocd app get <app-name> --refresh
 ```
 
+### Verificar Traefik
+```bash
+# Ver pods do Traefik
+kubectl get pods -n traefik
+
+# Ver logs do Traefik
+kubectl logs -n traefik -l app.kubernetes.io/name=traefik --tail=100
+
+# Ver rotas registradas
+kubectl get ingressroute -A
+
+# Acessar dashboard
+https://dashboard.vinicima.com
+
+# Verificar middlewares
+kubectl get middleware -A
+```
+
 ### Verificar Storage Longhorn
 ```bash
 # Status dos volumes
@@ -329,11 +406,27 @@ kubectl get pvc --all-namespaces
 kubectl port-forward -n longhorn-system svc/longhorn-frontend 8080:80
 ```
 
+### Debug de Roteamento
+```bash
+# Testar se app está respondendo
+curl -k https://app.vinicima.com
+
+# Ver logs do Traefik em tempo real
+kubectl logs -n traefik -l app.kubernetes.io/name=traefik -f
+
+# Verificar se middleware existe
+kubectl get middleware <middleware-name> -n <namespace>
+
+# Ver detalhes do IngressRoute
+kubectl describe ingressroute <app-name> -n <namespace>
+```
+
 ## 📚 Referências
 
 - [ArgoCD Documentation](https://argo-cd.readthedocs.io/)
 - [Kustomize Documentation](https://kustomize.io/)
 - [K3s Documentation](https://docs.k3s.io/)
+- [Traefik Documentation](https://doc.traefik.io/traefik/)
 - [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)
 - [Longhorn Documentation](https://longhorn.io/docs/)
 - [Calico Documentation](https://docs.tigera.io/calico/latest/about/)
@@ -356,6 +449,7 @@ Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes
 ![K3s](https://img.shields.io/badge/K3s-FFC61C?style=flat-square&logo=k3s&logoColor=black)
 ![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat-square&logo=argo&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
+![Traefik](https://img.shields.io/badge/Traefik-24A1C1?style=flat-square&logo=traefikproxy&logoColor=white)
 ![Longhorn](https://img.shields.io/badge/Longhorn-5E1F3F?style=flat-square)
 ![Calico](https://img.shields.io/badge/Calico-003366?style=flat-square)
 
@@ -363,4 +457,4 @@ Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes
 
 **Nota**: Este é um repositório para uso pessoal em ambiente homelab. Adapte as configurações de acordo com suas necessidades.
 
-**Cluster Status**: 🟢 Operacional | **Uptime**: 205+ dias | **Apps**: 100+ pods | **Nós**: 4
+**Cluster Status**: 🟢 Operacional | **Uptime**: 205+ dias | **Apps**: 100+ pods | **Nós**: 4 | **Ingress**: Traefik v3.6

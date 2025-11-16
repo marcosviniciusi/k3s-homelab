@@ -10,7 +10,7 @@ resources:
   - clusterrole.yaml
   - clusterrolebinding.yaml
   - daemonset.yaml
-  - service.yaml
+  - svc.yaml
   - gateway.yaml
   - gatewayclass.yaml
   - ingressroute.yaml

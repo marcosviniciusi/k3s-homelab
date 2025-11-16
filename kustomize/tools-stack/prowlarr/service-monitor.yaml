@@ -12,6 +12,6 @@ spec:
       app.kubernetes.io/instance: prowrr-exporter
   endpoints:
     - port: prowrr-monitoring
-      interval: 4m
-      scrapeTimeout: 90s
+      interval: 5m
+      scrapeTimeout: 4m
       path: /metrics

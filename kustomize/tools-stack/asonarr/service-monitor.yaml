@@ -12,6 +12,6 @@ spec:
       app.kubernetes.io/instance: sonarraexporter
   endpoints:
     - port: sonarramonitoring
-      interval: 4m
-      scrapeTimeout: 90s
+      interval: 5m
+      scrapeTimeout: 4m
       path: /metrics

@@ -3,8 +3,8 @@ kind: Kustomization
 namespace: longhorn-system
 resources:
   - longhorn.yaml
-  - longhorn-sealedsecret.yaml
-  - longhorn-infisical-sync.yml
+  - sealedsecret.yaml
+  - infisical-sync.yaml
   - middleware-01.yaml
   - middleware-02.yaml
-  - middleware.yaml
+  - ingressroute.yaml
