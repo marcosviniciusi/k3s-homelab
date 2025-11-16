@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sonarr-animes
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`animes-tv-k8s.vinicima.com`) || Host(`animes-tv.vinicima.com`)
+      kind: Rule
+      services:
+        - name: sonarr-animes
+          port: 8989
+      middlewares:
+        - name: body-size-50m
+          namespace: traefik
+  tls:
+    secretName: vinicima-com-tls

@@ -6,3 +6,4 @@ resources:
   - unmanic-svc.yml
   - unmanic-pvc.yml
   - unmanic-ing.yml
+  - unmanic-middleware.yml

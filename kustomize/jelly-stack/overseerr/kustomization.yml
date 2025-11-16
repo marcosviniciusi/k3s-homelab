@@ -8,3 +8,4 @@ resources:
   - overseerr-ing.yml
   - overseerr-infisical-sync.yml
   - sealedsecret.yaml
+  - overseerr-middleware.yml

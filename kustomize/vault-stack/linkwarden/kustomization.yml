@@ -8,3 +8,4 @@ resources:
   - linkwarden-ing.yml
   - linkwarden-infisical-sync.yml
   - sealedsecret.yaml
+  - linkwarden-middleware.yml

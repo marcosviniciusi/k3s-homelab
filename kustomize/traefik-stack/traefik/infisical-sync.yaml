@@ -1,0 +1,22 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: traefik-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: traefik-service-token
+        secretNamespace: traefik
+      secretsScope:
+        envSlug: production
+        secretsPath: /traefik
+
+  managedKubeSecretReferences:
+    - secretName: dashboard-auth-secret
+      secretNamespace: traefik
+      secretType: kubernetes.io/basic-auth
+      creationPolicy: "Owner"

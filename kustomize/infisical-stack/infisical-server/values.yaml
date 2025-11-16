@@ -1,0 +1,151 @@
+# -- Overrides the default release name
+nameOverride: ""
+
+# -- Overrides the full name of the release, affecting resource names
+fullnameOverride: ""
+
+infisical:
+  enabled: true # -- Enable Infisical chart deployment
+  name: infisical # -- Sets the name of the deployment within this chart
+  # -- Automatically migrates new database schema when deploying
+  autoDatabaseSchemaMigration: true
+
+  databaseSchemaMigrationJob:
+    image:
+      # -- Image repository for migration wait job
+      repository: ghcr.io/groundnuty/k8s-wait-for
+      # -- Image tag version
+      tag: no-root-v2.0
+      # -- Pulls image only if not present on the node
+      pullPolicy: IfNotPresent
+
+  serviceAccount:
+    # -- Creates a new service account if true, with necessary permissions for this chart. If false and `serviceAccount.name` is not defined, the chart will attempt to use the Default service account
+    create: true
+    # -- Custom annotations for the auto-created service account
+    annotations: {}
+    # -- Optional custom service account name, if existing service account is used
+    name: null
+
+  # -- Override for the full name of Infisical resources in this deployment
+  fullnameOverride: ""
+  # -- Custom annotations for Infisical pods
+  podAnnotations: {}
+  # -- Custom annotations for Infisical deployment
+  deploymentAnnotations: {}
+  # -- Number of pod replicas for high availability
+  replicaCount: 2
+
+  image:
+    # -- Image repository for the Infisical service
+    repository: infisical/infisical
+    # -- Specific version tag of the Infisical image. View the latest version here https://hub.docker.com/r/infisical/infisical
+    tag: "v0.132.4-postgres"
+    # -- Pulls image only if not already present on the node
+    pullPolicy: IfNotPresent
+    # -- Secret references for pulling the image, if needed
+    imagePullSecrets: []
+
+  # -- Node affinity settings for pod placement
+  affinity: {}
+  # -- Tolerations definitions
+  tolerations: []
+  # -- Node selector for pod placement
+  nodeSelector: {}
+  # -- Kubernetes Secret reference containing Infisical root credentials
+  kubeSecretRef: "infisical-secrets"
+
+  service:
+    # -- Custom annotations for Infisical service
+    annotations: {}
+    # -- Service type, can be changed based on exposure needs (e.g., LoadBalancer)
+    type: ClusterIP
+    # -- Optional node port for service when using NodePort type
+    nodePort: ""
+
+  resources:
+    limits:
+      # -- Memory limit for Infisical container
+      memory: 4000Mi
+      cpu: 4000m
+    requests:
+      # -- CPU request for Infisical container
+      cpu: 2000m
+      memory: 2000Mi
+
+ingress:
+  # -- Enable or disable ingress configuration
+  enabled: false
+  # -- Hostname for ingress access, e.g., app.example.com
+  hostName: "cofre.vinicima.com"
+  # -- Specifies the ingress class, useful for multi-ingress setups
+  ingressClassName: nginx
+
+  nginx:
+    # -- Enable NGINX-specific settings, if using NGINX ingress controller
+    enabled: false
+
+  # -- Custom annotations for ingress resource
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"                # Redireciona HTTP para HTTPS
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"          # Garante o redirect SSL
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"              # Limite de tamanho de upload (ajuste conforme o app)
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"          # Timeout maior para apps que demoram pra responder
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/ssl-prefer-server-ciphers: "true"   # Força uso de ciphers mais seguros
+    nginx.ingress.kubernetes.io/use-regex: "false"    
+  # -- TLS settings for HTTPS access
+  tls:
+  
+    # -- TLS secret name for HTTPS
+    secretName: vinicima.com-tls
+    # -- Domain name to associate with the TLS certificate
+    hosts:
+      - cofre-k8s.vinicima.com
+
+postgresql:
+  # -- Enables an in-cluster PostgreSQL deployment. To achieve HA for Postgres, we recommend deploying https://github.com/zalando/postgres-operator instead.
+  enabled: false
+  # -- PostgreSQL resource name
+  name: "postgresql"
+  # -- Full name override for PostgreSQL resources
+  fullnameOverride: "postgresql"
+
+  auth:
+    # -- Database username for PostgreSQL
+    username: infisical
+    # -- Password for PostgreSQL database access
+    password: EXAf6JO7f0Kjw8exY4
+    # -- Database name for Infisical
+    database: infisicalDB
+
+  useExistingPostgresSecret:
+    # -- Set to true if using an existing Kubernetes secret that contains PostgreSQL connection string
+    enabled: true
+    existingConnectionStringSecret:
+      # -- Kubernetes secret name containing the PostgreSQL connection string
+      name: "infisical-postgres-secret"
+      # -- Key name in the Kubernetes secret that holds the connection string
+      key: "DATABASE_URL"
+
+redis:
+  # -- Enables an in-cluster Redis deployment
+  enabled: true
+  # -- Redis resource name
+  name: "redis"
+  # -- Full name override for Redis resources
+  fullnameOverride: "redis"
+
+  cluster:
+    # -- Clustered Redis deployment
+    enabled: false
+
+  # -- Requires a password for Redis authentication
+  usePassword: true
+
+  auth:
+    # -- Redis password
+    password: "P7RYXV5IdE6kLoH2dB"
+
+  # -- Redis deployment type (e.g., standalone or cluster)
+  architecture: standalone

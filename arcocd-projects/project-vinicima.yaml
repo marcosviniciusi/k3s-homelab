@@ -123,6 +123,44 @@ spec:
     kind: Ingress
   - group: networking.k8s.io
     kind: IngressClass
+  - group: networking.k8s.io
+    kind: IngressClass
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+  - group: gateway.networking.k8s.io
+    kind: GatewayClass
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+  - group: gateway.networking.k8s.io
+    kind: ReferenceGrant
+  - group: gateway.networking.k8s.io
+    kind: GRPCRoute
+  - group: gateway.networking.k8s.io
+    kind: TCPRoute
+  - group: gateway.networking.k8s.io
+    kind: TLSRoute
+  - group: gateway.networking.k8s.io
+    kind: UDPRoute
+  - group: traefik.io
+    kind: IngressRoute
+  - group: traefik.io
+    kind: IngressRouteTCP
+  - group: traefik.io
+    kind: IngressRouteUDP
+  - group: traefik.io
+    kind: Middleware
+  - group: traefik.io
+    kind: MiddlewareTCP
+  - group: traefik.io
+    kind: ServersTransport
+  - group: traefik.io
+    kind: ServersTransportTCP
+  - group: traefik.io
+    kind: TLSOption
+  - group: traefik.io
+    kind: TLSStore
+  - group: traefik.io
+    kind: TraefikService
   destinations:
   - name: '*'
     namespace: '*'

@@ -3,3 +3,4 @@ kind: Kustomization
 namespace: argocd
 resources:
   - argocd-ingress.yaml
+  - argocd-middleware.yaml

@@ -7,3 +7,4 @@ resources:
   - readarr-ing.yml
   - readarr-infisical-sync.yml
   - sealedsecret.yaml
+  - readarr-middleware.yaml

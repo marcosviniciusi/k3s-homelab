@@ -7,3 +7,4 @@ resources:
   - sealedsecret.yaml
   - photoprism-mgabriel-ing.yml
   - photoprism-mgabriel-infisical-sync.yml
+  - photoprism-mgabriel-middleware.yml

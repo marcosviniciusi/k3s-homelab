@@ -7,3 +7,4 @@ resources:
   - radarr-ing.yml
   - sealedsecret.yaml
   - radarr-infisical-sync.yml
+  - radarr-middleware.yml

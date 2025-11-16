@@ -7,3 +7,4 @@ resources:
   - lidarr-ing.yml
   - lidarr-infisical-sync.yml
   - sealedsecret.yaml
+  - lidarr-middleware.yml

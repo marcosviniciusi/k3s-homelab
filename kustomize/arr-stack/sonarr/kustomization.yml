@@ -7,3 +7,4 @@ resources:
   - sonarr-ing.yml
   - sealedsecret.yaml
   - sonarr-infisical-sync.yml
+  - sonarr-middleware.yaml

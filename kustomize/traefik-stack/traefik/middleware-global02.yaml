@@ -1,0 +1,10 @@
+# Middleware para timeouts longos
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: long-timeout
+  namespace: traefik
+spec:
+  forwardAuth:
+    address: "http://localhost"
+    trustForwardHeader: true

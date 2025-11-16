@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: photo-dsoares
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`dsoares-k8s.vinicima.com`) || Host(`dsoares.vinicima.com`)
+      kind: Rule
+      services:
+        - name: photo-dsoares
+          port: 2342
+      middlewares:
+        - name: body-size-50m
+          namespace: traefik
+  tls:
+    secretName: vinicima.com-tls

@@ -8,3 +8,4 @@ resources:
   - sealedsecret.yaml
   - lingarr-animes-pvc.yml
   - lingarr-animes-infisical-sync.yml
+  - lingarr-animes-middleware.yml

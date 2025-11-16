@@ -10,3 +10,4 @@ resources:
   - keel-rbac-clusterrolebinding.yaml
   - keel-serviceaccount.yaml
   - keel-svc.yml
+  - keel-middleware.yaml

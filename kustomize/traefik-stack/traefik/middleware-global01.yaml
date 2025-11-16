@@ -1,0 +1,9 @@
+# Middleware para tamanho de body
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: body-size-50m
+  namespace: traefik
+spec:
+  buffering:
+    maxRequestBodyBytes: 52428800  # 50MB

@@ -6,3 +6,4 @@ resources:
   - huntarr-svc.yml
   - huntarr-pvc.yml
   - huntarr-ing.yml
+  - huntarr-middlerare.yml

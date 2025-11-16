@@ -6,3 +6,4 @@ resources:
   - uptime-kuma-ingress.yaml
   - uptime-kuma-service.yaml
   - uptime-kuma-test-connection.yaml
+  - uptime-kuma-middleware.yaml

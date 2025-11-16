@@ -7,3 +7,4 @@ resources:
   - whisparr-ing.yml
   - whisparr-infisical-sync.yml
   - sealedsecret.yaml
+  - whisparr-middleware.yaml

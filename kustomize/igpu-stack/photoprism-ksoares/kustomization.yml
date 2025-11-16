@@ -7,3 +7,4 @@ resources:
   - sealedsecret.yaml
   - photoprism-ksoares-ing.yml
   - photoprism-ksoares-infisical-sync.yml
+  - photoprism-ksoares-middleware.yml

@@ -9,3 +9,4 @@ resources:
   - qrcode-ing.yml
   - qrcode-infisical-sync.yml
   - sealedsecret.yaml
+  - qrcode-middleware.yml

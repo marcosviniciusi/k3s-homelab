@@ -8,3 +8,4 @@ resources:
   - vault-ing.yml
   - vault-infisical-sync.yml
   - sealedsecret.yaml
+  - vault-middleware.yml

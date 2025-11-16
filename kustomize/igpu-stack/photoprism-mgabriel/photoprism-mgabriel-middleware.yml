@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: photo-mgabriel
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`mgabriel-k8s.vinicima.com`) || Host(`mgabriel.vinicima.com`)
+      kind: Rule
+      services:
+        - name: photo-mgabriel
+          port: 2342
+      middlewares:
+        - name: body-size-50m
+          namespace: traefik
+  tls:
+    secretName: vinicima.com-tls

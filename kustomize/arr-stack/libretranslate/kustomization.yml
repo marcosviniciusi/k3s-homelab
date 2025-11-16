@@ -7,3 +7,4 @@ resources:
   - libretranslate-ing.yaml
   - libretranslate-configmap.yaml
   - libretranslate-pvc.yml
+  - libretranslate-middleware.yaml
