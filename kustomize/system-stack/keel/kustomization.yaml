@@ -8,5 +8,5 @@ resources:
   - rbac-clusterrole.yaml
   - rbac-clusterrolebinding.yaml
   - serviceaccount.yaml
-  - svc.yml
+  - svc.yaml
   - ingressroute.yaml

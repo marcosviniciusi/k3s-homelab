@@ -8,11 +8,11 @@ resources:
   - clusterrolebinding-secrets-operato-manager-rolebinding.yaml
   - clusterrolebinding-secrets-operato-proxy-rolebinding.yaml
   - crd-clustergenerators.secrets.yaml
-  - rd-infisicaldynamicsecrets-secrets.yaml
+  - crd-infisicaldynamicsecrets-secrets.yaml
   - crd-infisicalpushsecrets-secrets.yaml 
   - crd-infisicalsecrets-secrets.yaml
   - deployment-secrets-operato-controller-manager.yaml
   - role-secrets-operato-leader-election-role.yaml
   - rolebinding-secrets-operato-leader-election-rolebinding.yaml
-  - ervice-secrets-operato-controller-manager-metrics-service.yaml
+  - service-secrets-operato-controller-manager-metrics-service.yaml
   - serviceaccount-secrets-operato-controller-manager.yaml

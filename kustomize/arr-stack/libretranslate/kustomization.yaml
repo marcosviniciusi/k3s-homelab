@@ -5,5 +5,5 @@ resources:
   - deploy.yaml
   - svc.yaml
   - configmap.yaml
-  - pvc.yml
+  - pvc.yaml
   - ingressroute.yaml
