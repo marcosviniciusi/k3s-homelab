@@ -5,5 +5,4 @@ resources:
   - jellyfin-deploy.yml
   - jellyfin-svc.yml
   - jellyfin-pvc.yml
-  - jellyfin-ing.yml
   - jellyfin-middleware.yml

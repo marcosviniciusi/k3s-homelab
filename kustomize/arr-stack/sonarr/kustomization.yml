@@ -4,7 +4,6 @@ namespace: arr
 resources:
   - sonarr-deploy.yml
   - sonarr-svc.yml
-  - sonarr-ing.yml
   - sealedsecret.yaml
   - sonarr-infisical-sync.yml
   - sonarr-middleware.yaml

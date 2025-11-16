@@ -4,7 +4,6 @@ namespace: arr
 resources:
   - prowlarr-deploy.yml
   - prowlarr-svc.yml
-  - prowlarr-ing.yml
   - prowlarr-infisical-sync.yml
   - sealedsecret.yaml
   - prowlarr-middleware.yml

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: traefik
+  namespace: traefik
   labels:
     app.kubernetes.io/name: traefik
     app.kubernetes.io/instance: traefik-traefik
@@ -92,6 +93,8 @@ spec:
         
         
           - "--providers.kubernetescrd"
+          - "--providers.kubernetescrd.allowCrossNamespace=true"
+          - "--providers.kubernetescrd.allowExternalNameServices=true"
           - "--providers.kubernetescrd.allowEmptyServices=true"
           - "--providers.kubernetesgateway"
           - "--providers.kubernetesgateway.statusaddress.service.name=traefik"

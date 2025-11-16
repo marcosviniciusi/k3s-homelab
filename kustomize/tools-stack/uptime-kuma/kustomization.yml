@@ -3,7 +3,6 @@ kind: Kustomization
 namespace: tools
 resources:
   - uptime-kuma-deployment.yaml
-  - uptime-kuma-ingress.yaml
   - uptime-kuma-service.yaml
   - uptime-kuma-test-connection.yaml
   - uptime-kuma-middleware.yaml

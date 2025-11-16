@@ -4,7 +4,6 @@ namespace: arr
 resources:
   - lingarr-animes-deploy.yml
   - lingarr-animes-svc.yml
-  - lingarr-animes-ing.yml
   - sealedsecret.yaml
   - lingarr-animes-pvc.yml
   - lingarr-animes-infisical-sync.yml

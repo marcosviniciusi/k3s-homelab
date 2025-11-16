@@ -6,7 +6,6 @@ resources:
   - qrcode-svc.yml
   - qrcode-configmap.yml
   - qrcode-pvc.yml
-  - qrcode-ing.yml
   - qrcode-infisical-sync.yml
   - sealedsecret.yaml
   - qrcode-middleware.yml

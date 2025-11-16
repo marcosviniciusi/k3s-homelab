@@ -5,7 +5,6 @@ resources:
   - linkwarden-deploy.yml
   - linkwarden-svc.yml
   - linkwarden-pvc.yml
-  - linkwarden-ing.yml
   - linkwarden-infisical-sync.yml
   - sealedsecret.yaml
   - linkwarden-middleware.yml

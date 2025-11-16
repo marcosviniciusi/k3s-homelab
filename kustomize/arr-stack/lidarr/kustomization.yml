@@ -4,7 +4,6 @@ namespace: arr
 resources:
   - lidarr-deploy.yml
   - lidarr-svc.yml
-  - lidarr-ing.yml
   - lidarr-infisical-sync.yml
   - sealedsecret.yaml
   - lidarr-middleware.yml

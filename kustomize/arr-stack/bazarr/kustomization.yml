@@ -4,7 +4,6 @@ namespace: arr
 resources:
   - bazarr-deploy.yml
   - bazarr-svc.yml
-  - bazarr-ing.yml
   - sealedsecret.yaml
   - bazarr-infisical-sync.yml
   - bazarr-middleware.yml

@@ -4,7 +4,6 @@ namespace: arr
 resources:
   - whisparr-deploy.yml
   - whisparr-svc.yml
-  - whisparr-ing.yml
   - whisparr-infisical-sync.yml
   - sealedsecret.yaml
   - whisparr-middleware.yaml

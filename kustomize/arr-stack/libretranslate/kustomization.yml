@@ -4,7 +4,6 @@ namespace: arr
 resources:
   - libretranslate-deploy.yaml
   - libretranslate-svc.yaml
-  - libretranslate-ing.yaml
   - libretranslate-configmap.yaml
   - libretranslate-pvc.yml
   - libretranslate-middleware.yaml

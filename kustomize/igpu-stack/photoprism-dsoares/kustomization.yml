@@ -5,6 +5,5 @@ resources:
   - photoprism-dsoares-deploy.yml
   - photoprism-dsoares-svc.yml
   - sealedsecret.yaml
-  - photoprism-dsoares-ing.yml
   - photoprism-dsoares-infisical-sync.yml
   - photoprism-dsoares-middleware.yml

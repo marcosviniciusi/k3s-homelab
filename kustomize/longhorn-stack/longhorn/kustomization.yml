@@ -5,7 +5,6 @@ resources:
   - longhorn.yaml
   - longhorn-sealedsecret.yaml
   - longhorn-infisical-sync.yml
-  - ingress.yaml
   - middleware-01.yaml
   - middleware-02.yaml
   - middleware.yaml
