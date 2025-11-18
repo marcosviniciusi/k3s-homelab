@@ -1,0 +1,922 @@
+################################################################
+# HTTP Middlewares
+################################################################
+[http.middlewares]
+
+  ################################################################
+  # Security Headers - Mozilla Observatory A+ Rating
+  ################################################################
+  [http.middlewares.security-headers.headers]
+    sslRedirect = true
+    stsSeconds = 63072000
+    stsIncludeSubdomains = true
+    stsPreload = true
+    forceSTSHeader = true
+    frameDeny = false
+    customFrameOptionsValue = "SAMEORIGIN"
+    contentTypeNosniff = true
+    browserXssFilter = true
+    referrerPolicy = "strict-origin-when-cross-origin"
+    permissionsPolicy = "geolocation=(), microphone=(), camera=()"
+
+    [http.middlewares.security-headers.headers.customResponseHeaders]
+      X-Robots-Tag = "noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+
+  ################################################################
+  # Media Headers - Jellyfin/Emby/Overseerr com CSP
+  ################################################################
+  [http.middlewares.media-headers.headers]
+    sslRedirect = true
+    stsSeconds = 63072000
+    stsIncludeSubdomains = true
+    stsPreload = true
+    forceSTSHeader = true
+    contentTypeNosniff = true
+    browserXssFilter = true
+
+    [http.middlewares.media-headers.headers.customResponseHeaders]
+      Content-Security-Policy = "default-src 'none'; font-src 'self'; connect-src 'self' wss: ws: https://mb3admin.com; media-src 'self' blob: data:; manifest-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'; object-src 'none'; worker-src 'self' blob:; script-src 'self' https://www.gstatic.com https://static.cloudflareinsights.com; img-src data: https: http:; style-src 'unsafe-inline' 'self'"
+      X-Frame-Options = "SAMEORIGIN"
+      Referrer-Policy = "no-referrer,same-origin,strict-origin,strict-origin-when-cross-origin"
+      X-XSS-Protection = "1; mode=block"
+      X-Content-Type-Options = "nosniff"
+
+  ################################################################
+  # IP Whitelists
+  ################################################################
+
+  # Nível 1: REDE LOCAL RESTRITO (VPN/Servers)
+  [http.middlewares.restrict-local.ipAllowList]
+    sourceRange = [
+      "192.168.253.2/32",
+      "192.168.253.3/32",
+      "192.168.253.4/32",
+      "192.168.253.5/32",
+      "192.168.254.0/26",
+      "192.168.250.0/28",
+      "192.168.249.0/24",
+      "192.168.248.250/32",
+      "fd00:0000:0000:0200::/64",
+      "fd00:0:0:0206::/64"
+    ]
+
+  # Nível 2: Local Sem Restrição (Toda rede local)
+  [http.middlewares.full-local.ipAllowList]
+    sourceRange = [
+      "192.168.253.0/24",
+      "192.168.249.0/24",
+      "192.168.250.0/25",
+      "192.168.250.128/26",
+      "192.168.251.0/24",
+      "192.168.252.0/22",
+      "192.168.250.224/27",
+      "192.168.250.235/32",
+      "fd00:0:0:0200::/56",
+      "fd00::203:a085:f2ff:fe11:3f10/128"
+    ]
+
+  ################################################################
+  # Rate Limiting e proteções para serviços públicos
+  ################################################################
+  [http.middlewares.rate-limit-public.rateLimit]
+    average = 100
+    burst = 50
+    period = "1m"
+
+  # Redirect para imagens ruins do Jellyfin/Emby/Overseerr
+  [http.middlewares.block-bad-images.redirectRegex]
+    regex = "^/(Images/Remote|Items/RemoteSearch/Image|Items/[^\\.]+/RemoteImages/Download)"
+    replacement = "https://i.ytimg.com/vi/avCWDDox1nE/maxresdefault.jpg"
+    permanent = false
+
+################################################################
+# HTTP Routers - Nível 1: REDE LOCAL RESTRITO (VPN/Servers)
+################################################################
+[http.routers]
+
+  ##### REDE LOCAL RESTRITO #####
+
+  [http.routers.kratos]
+    rule = "Host(`kratos.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "kratos-service"
+    [http.routers.kratos.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.dashboard]
+    rule = "Host(`dashboard.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "dashboard-service"
+    [http.routers.dashboard.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.lingarr]
+    rule = "Host(`lingarr.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "lingarr-service"
+    [http.routers.lingarr.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.animes-lingarr]
+    rule = "Host(`animes-lingarr.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "animes-lingarr-service"
+    [http.routers.animes-lingarr.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.linkwarden]
+    rule = "Host(`linkwarden.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "linkwarden-service"
+    [http.routers.linkwarden.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.translate-vpn]
+    rule = "Host(`translate.vinicima.com`)"
+    entryPoints = ["websecure"]
+    priority = 100
+    middlewares = ["restrict-local", "security-headers"]
+    service = "translate-service"
+    [http.routers.translate-vpn.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.argocd]
+    rule = "Host(`argocd.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "argocd-service"
+    [http.routers.argocd.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.minio-vpn]
+    rule = "Host(`minio.vinicima.com`)"
+    entryPoints = ["websecure"]
+    priority = 100
+    middlewares = ["restrict-local", "security-headers"]
+    service = "minio-service"
+    [http.routers.minio-vpn.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.fw01]
+    rule = "Host(`fw01.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "fw01-service"
+    [http.routers.fw01.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.sgt]
+    rule = "Host(`sgt.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "sgt-service"
+    [http.routers.sgt.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.unmanic-movies]
+    rule = "Host(`unmanic-movies.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "unmanic-movies-service"
+    [http.routers.unmanic-movies.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.unmanic-series]
+    rule = "Host(`unmanic-series.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "unmanic-series-service"
+    [http.routers.unmanic-series.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.proxmox]
+    rule = "Host(`proxmox.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "proxmox-service"
+    [http.routers.proxmox.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.omv01]
+    rule = "Host(`omv01.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "omv01-service"
+    [http.routers.omv01.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.pbs]
+    rule = "Host(`pbs.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "pbs-service"
+    [http.routers.pbs.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.pbs02]
+    rule = "Host(`pbs02.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "pbs02-service"
+    [http.routers.pbs02.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.omada]
+    rule = "Host(`omada.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "omada-service"
+    [http.routers.omada.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.abby]
+    rule = "Host(`abby.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "abby-service"
+    [http.routers.abby.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.dbadmin]
+    rule = "Host(`dbadmin.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "dbadmin-service"
+    [http.routers.dbadmin.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.dsoares]
+    rule = "Host(`dsoares.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "dsoares-service"
+    [http.routers.dsoares.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.ksoares]
+    rule = "Host(`ksoares.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "ksoares-service"
+    [http.routers.ksoares.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.mgabriel]
+    rule = "Host(`mgabriel.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "mgabriel-service"
+    [http.routers.mgabriel.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.nxc]
+    rule = "Host(`nxc.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "nxc-service"
+    [http.routers.nxc.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.qrcode]
+    rule = "Host(`qrcode.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "qrcode-service"
+    [http.routers.qrcode.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.notes]
+    rule = "Host(`notes.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "notes-service"
+    [http.routers.notes.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.adguard]
+    rule = "Host(`adguard.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "adguard-service"
+    [http.routers.adguard.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.rag01]
+    rule = "Host(`rag01.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "rag01-service"
+    [http.routers.rag01.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.lh]
+    rule = "Host(`lh.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "lh-service"
+    [http.routers.lh.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.keel]
+    rule = "Host(`keel.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "keel-service"
+    [http.routers.keel.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.jellystat]
+    rule = "Host(`jellystat.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "jellystat-service"
+    [http.routers.jellystat.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.uptime]
+    rule = "Host(`uptime.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "uptime-service"
+    [http.routers.uptime.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.huntarr]
+    rule = "Host(`huntarr.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["restrict-local", "security-headers"]
+    service = "huntarr-service"
+    [http.routers.huntarr.tls]
+      certResolver = "letsencrypt"
+
+  ################################################################
+  # Nível 2: Local Sem Restrição (Toda rede local)
+  ################################################################
+
+  [http.routers.blob]
+    rule = "Host(`blob.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "blob-service"
+    [http.routers.blob.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.comics]
+    rule = "Host(`comics.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "comics-service"
+    [http.routers.comics.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.emby]
+    rule = "Host(`emby.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "media-headers", "block-bad-images"]
+    service = "emby-service"
+    [http.routers.emby.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.cofre]
+    rule = "Host(`cofre.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "cofre-service"
+    [http.routers.cofre.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.ebook]
+    rule = "Host(`ebook.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "ebook-service"
+    [http.routers.ebook.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.grafana]
+    rule = "Host(`grafana.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "grafana-service"
+    [http.routers.grafana.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.translate-local]
+    rule = "Host(`translate.vinicima.com`)"
+    entryPoints = ["websecure"]
+    priority = 50
+    middlewares = ["full-local", "security-headers"]
+    service = "translate-service"
+    [http.routers.translate-local.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.influxdb]
+    rule = "Host(`influxdb.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "influxdb-service"
+    [http.routers.influxdb.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.legendas]
+    rule = "Host(`legendas.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "legendas-service"
+    [http.routers.legendas.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.animes-legendas]
+    rule = "Host(`animes-legendas.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "animes-legendas-service"
+    [http.routers.animes-legendas.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.movies]
+    rule = "Host(`movies.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "movies-service"
+    [http.routers.movies.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.musics]
+    rule = "Host(`musics.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "musics-service"
+    [http.routers.musics.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.nzb]
+    rule = "Host(`nzb.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "nzb-service"
+    [http.routers.nzb.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.prowlarr]
+    rule = "Host(`prowlarr.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "prowlarr-service"
+    [http.routers.prowlarr.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.rss]
+    rule = "Host(`rss.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "rss-service"
+    [http.routers.rss.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.series]
+    rule = "Host(`series.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "series-service"
+    [http.routers.series.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.registry]
+    rule = "Host(`registry.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "registry-service"
+    [http.routers.registry.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.speedtest]
+    rule = "Host(`speedtest.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "speedtest-service"
+    [http.routers.speedtest.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.torrent]
+    rule = "Host(`torrent.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "torrent-service"
+    [http.routers.torrent.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.qui]
+    rule = "Host(`qui.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "qui-service"
+    [http.routers.qui.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.videosx]
+    rule = "Host(`videosx.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "videosx-service"
+    [http.routers.videosx.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.animes-movies]
+    rule = "Host(`animes-movies.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "animes-movies-service"
+    [http.routers.animes-movies.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.animes-tv]
+    rule = "Host(`animes-tv.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "animes-tv-service"
+    [http.routers.animes-tv.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.slk]
+    rule = "Host(`slk.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["full-local", "security-headers"]
+    service = "slk-service"
+    [http.routers.slk.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.minio-local]
+    rule = "Host(`minio.vinicima.com`)"
+    entryPoints = ["websecure"]
+    priority = 50
+    middlewares = ["full-local", "security-headers"]
+    service = "minio-service"
+    [http.routers.minio-local.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.vault-local]
+    rule = "Host(`vault.vinicima.com`)"
+    entryPoints = ["websecure"]
+    priority = 50
+    middlewares = ["full-local", "security-headers"]
+    service = "vault-service"
+    [http.routers.vault-local.tls]
+      certResolver = "letsencrypt"
+
+  ################################################################
+  # Nível 3: PUBLIC (Internet + Local + VPN)
+  ################################################################
+
+  [http.routers.ovs]
+    rule = "Host(`ovs.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["media-headers", "block-bad-images", "rate-limit-public"]
+    service = "ovs-service"
+    [http.routers.ovs.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.jelly]
+    rule = "Host(`jelly.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["media-headers", "block-bad-images", "rate-limit-public"]
+    service = "jelly-service"
+    [http.routers.jelly.tls]
+      certResolver = "letsencrypt"
+
+  [http.routers.ovs-animes]
+    rule = "Host(`ovs-animes.vinicima.com`)"
+    entryPoints = ["websecure"]
+    middlewares = ["media-headers", "block-bad-images", "rate-limit-public"]
+    service = "ovs-animes-service"
+    [http.routers.ovs-animes.tls]
+      certResolver = "letsencrypt"
+
+################################################################
+# HTTP Services - Backend Definitions
+################################################################
+[http.services]
+
+  ##### REDE LOCAL RESTRITO #####
+
+  [http.services.kratos-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    passHostHeader = true
+    [[http.services.kratos-service.loadBalancer.servers]]
+      url = "https://192.168.254.1:9443"
+
+  [http.services.dashboard-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.dashboard-service.loadBalancer.servers]]
+      url = "https://dashboard-k8s.vinicima.com:443"
+
+  [http.services.lingarr-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.lingarr-service.loadBalancer.servers]]
+      url = "https://lingarr-k8s.vinicima.com:443"
+
+  [http.services.animes-lingarr-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.animes-lingarr-service.loadBalancer.servers]]
+      url = "https://animes-lingarr-k8s.vinicima.com:443"
+
+  [http.services.linkwarden-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.linkwarden-service.loadBalancer.servers]]
+      url = "https://linkwarden-k8s.vinicima.com:443"
+
+  [http.services.translate-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.translate-service.loadBalancer.servers]]
+      url = "https://translate-k8s.vinicima.com:443"
+
+  [http.services.argocd-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.argocd-service.loadBalancer.servers]]
+      url = "https://argocd-k8s.vinicima.com:443"
+
+  [http.services.minio-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.minio-service.loadBalancer.servers]]
+      url = "http://192.168.250.68:9001"
+
+  [http.services.fw01-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.fw01-service.loadBalancer.servers]]
+      url = "https://192.168.254.1:9443"
+
+  [http.services.sgt-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.sgt-service.loadBalancer.servers]]
+      url = "http://192.168.253.13:5000"
+
+  [http.services.unmanic-movies-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.unmanic-movies-service.loadBalancer.servers]]
+      url = "http://192.168.253.26:8888"
+
+  [http.services.unmanic-series-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.unmanic-series-service.loadBalancer.servers]]
+      url = "http://192.168.253.27:8888"
+
+  [http.services.proxmox-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.proxmox-service.loadBalancer.servers]]
+      url = "https://192.168.250.3:8006"
+
+  [http.services.omv01-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.omv01-service.loadBalancer.servers]]
+      url = "http://192.168.250.3:80"
+
+  [http.services.pbs-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.pbs-service.loadBalancer.servers]]
+      url = "https://192.168.250.13:8007"
+
+  [http.services.pbs02-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.pbs02-service.loadBalancer.servers]]
+      url = "https://192.168.250.2:8007"
+
+  [http.services.omada-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.omada-service.loadBalancer.servers]]
+      url = "https://192.168.250.90:8043"
+
+  [http.services.abby-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.abby-service.loadBalancer.servers]]
+      url = "https://192.168.248.250:8006"
+
+  [http.services.dbadmin-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.dbadmin-service.loadBalancer.servers]]
+      url = "http://192.168.250.78:8080"
+
+  [http.services.dsoares-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.dsoares-service.loadBalancer.servers]]
+      url = "http://192.168.253.30:2342"
+
+  [http.services.ksoares-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.ksoares-service.loadBalancer.servers]]
+      url = "http://192.168.253.29:2342"
+
+  [http.services.mgabriel-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.mgabriel-service.loadBalancer.servers]]
+      url = "http://192.168.253.28:2342"
+
+  [http.services.nxc-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.nxc-service.loadBalancer.servers]]
+      url = "https://192.168.252.25:443"
+
+  [http.services.qrcode-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.qrcode-service.loadBalancer.servers]]
+      url = "http://192.168.253.25:80"
+
+  [http.services.notes-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.notes-service.loadBalancer.servers]]
+      url = "http://192.168.252.152:8080"
+
+  [http.services.adguard-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.adguard-service.loadBalancer.servers]]
+      url = "http://127.4.4.3:8080"
+
+  [http.services.rag01-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.rag01-service.loadBalancer.servers]]
+      url = "http://192.168.254.2:4470"
+
+  [http.services.lh-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.lh-service.loadBalancer.servers]]
+      url = "https://lh-k8s.vinicima.com:443"
+
+  [http.services.keel-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.keel-service.loadBalancer.servers]]
+      url = "https://keel-k8s.vinicima.com:443"
+
+  [http.services.jellystat-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.jellystat-service.loadBalancer.servers]]
+      url = "http://192.168.253.20:3000"
+
+  [http.services.uptime-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.uptime-service.loadBalancer.servers]]
+      url = "https://uptime-k8s.vinicima.com:443"
+
+  [http.services.huntarr-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.huntarr-service.loadBalancer.servers]]
+      url = "http://192.168.253.22:9705"
+
+  ##### Local Sem Restrição #####
+
+  [http.services.blob-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.blob-service.loadBalancer.servers]]
+      url = "http://192.168.250.68:9000"
+
+  [http.services.comics-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.comics-service.loadBalancer.servers]]
+      url = "http://192.168.252.5:8090"
+
+  [http.services.emby-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.emby-service.loadBalancer.servers]]
+      url = "http://192.168.253.11:8096"
+    [http.services.emby-service.loadBalancer.sticky]
+      [http.services.emby-service.loadBalancer.sticky.cookie]
+        name = "emby_sticky"
+        secure = true
+        httpOnly = true
+
+  [http.services.cofre-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.cofre-service.loadBalancer.servers]]
+      url = "http://192.168.250.74:8080"
+
+  [http.services.ebook-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.ebook-service.loadBalancer.servers]]
+      url = "http://192.168.253.16:8787"
+
+  [http.services.grafana-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.grafana-service.loadBalancer.servers]]
+      url = "http://localhost:3000"
+
+  [http.services.influxdb-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.influxdb-service.loadBalancer.servers]]
+      url = "http://localhost:8086"
+
+  [http.services.legendas-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.legendas-service.loadBalancer.servers]]
+      url = "http://192.168.253.31:6767"
+
+  [http.services.animes-legendas-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.animes-legendas-service.loadBalancer.servers]]
+      url = "http://192.168.253.32:6767"
+
+  [http.services.movies-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.movies-service.loadBalancer.servers]]
+      url = "http://192.168.253.52:7878"
+
+  [http.services.musics-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.musics-service.loadBalancer.servers]]
+      url = "http://192.168.253.17:8686"
+
+  [http.services.nzb-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.nzb-service.loadBalancer.servers]]
+      url = "http://192.168.250.231:6789"
+
+  [http.services.prowlarr-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.prowlarr-service.loadBalancer.servers]]
+      url = "http://192.168.253.14:9696"
+
+  [http.services.rss-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.rss-service.loadBalancer.servers]]
+      url = "http://192.168.252.14:80"
+
+  [http.services.series-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.series-service.loadBalancer.servers]]
+      url = "http://192.168.253.51:8989"
+
+  [http.services.registry-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.registry-service.loadBalancer.servers]]
+      url = "http://192.168.252.254:80"
+
+  [http.services.speedtest-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.speedtest-service.loadBalancer.servers]]
+      url = "http://192.168.252.2:80"
+
+  [http.services.torrent-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.torrent-service.loadBalancer.servers]]
+      url = "http://192.168.250.230:8090"
+
+  [http.services.qui-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.qui-service.loadBalancer.servers]]
+      url = "http://192.168.250.230:7476"
+
+  [http.services.videosx-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.videosx-service.loadBalancer.servers]]
+      url = "http://192.168.253.15:6969"
+
+  [http.services.animes-movies-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.animes-movies-service.loadBalancer.servers]]
+      url = "http://192.168.253.55:7878"
+
+  [http.services.animes-tv-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.animes-tv-service.loadBalancer.servers]]
+      url = "http://192.168.253.54:8989"
+
+  [http.services.slk-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.slk-service.loadBalancer.servers]]
+      url = "http://192.168.250.232:5030"
+      
+  [http.services.vault-service.loadBalancer]
+    serversTransport = "insecure-transport"
+    [[http.services.vault-service.loadBalancer.servers]]
+      url = "https://vault-k8s.vinicima.com:443"
+
+  ##### PUBLIC #####
+
+  [http.services.ovs-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.ovs-service.loadBalancer.servers]]
+      url = "http://192.168.253.18:5055"
+
+  [http.services.jelly-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.jelly-service.loadBalancer.servers]]
+      url = "http://192.168.253.12:8096"
+    [http.services.jelly-service.loadBalancer.sticky]
+      [http.services.jelly-service.loadBalancer.sticky.cookie]
+        name = "jelly_sticky"
+        secure = true
+        httpOnly = true
+
+  [http.services.ovs-animes-service.loadBalancer]
+    passHostHeader = true
+    [[http.services.ovs-animes-service.loadBalancer.servers]]
+      url = "http://192.168.253.19:5055"
+
+################################################################
+# Server Transports
+################################################################
+[http.serversTransports]
+  [http.serversTransports.insecure-transport]
+    insecureSkipVerify = true

@@ -1,0 +1,35 @@
+
+# Adicionar ao loader para carregar no boot
+echo 'mac_portacl_load="YES"' >> /boot/loader.conf
+
+Baixar Repo
+fetch -o /usr/local/etc/pkg/repos/mimugmail.conf https://www.routerperformance.net/mimugmail.conf
+
+## Adicionar ao final do arquivo incluir variavel no ansible
+/etc/rc.conf
+traefik_env="CF_DNS_API_TOKEN="$CLOUDFLARE TOKEN"
+traefik_conf=/usr/local/etc/traefik.yml
+
+opcional ao /etc/rc.conf
+traefik_user=traefik
+traefik_group=traefik
+
+
+Ou tornar default: ( adicionando no web)
+# MAC portacl - Permitir usuário traefik nas portas 80/443
+security.mac.portacl.enabled=1
+security.mac.portacl.port_high=1023
+security.mac.portacl.suser_exempt=1
+net.inet.ip.portrange.reservedlow=0
+net.inet.ip.portrange.reservedhigh=0
+security.mac.portacl.rules=uid:475:tcp:80,uid:475:tcp:443
+
+#Traefik tunning
+Terminal
+chown traefik:traefik /usr/local/etc/traefik.yml
+chown traefik:traefik /usr/local/etc/traefik.toml
+mkdir /var/db/traefik
+mkdir /var/log/traefik
+touch /var/db/traefik/acme.json
+chown -R traefik:traefik /var/log/traefik /var/db/traefik 
+chmod 600 /var/db/traefik/acme.json
