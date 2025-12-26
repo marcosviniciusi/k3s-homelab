@@ -519,4 +519,4 @@ Projeto de documentação pessoal sem licença específica. Todo o conteúdo é 
 
 **Nota**: Este é um repositório para uso pessoal em ambiente homelab. Adapte as configurações de acordo com suas necessidades.
 
-**Cluster Status**: 🟢 Operacional | **Uptime**: 205+ dias | **Apps**: 100+ pods | **Nós**: 4 | **CNI**: Cilium+BGP | **Ingress**: Traefik v3.6
+**Cluster Status**: 🟢 Operacional | **Uptime**: 300+ dias | **Apps**: 120+ pods | **Nós**: 4 | **CNI**: Cilium+BGP | **Ingress**: Traefik v3.6
