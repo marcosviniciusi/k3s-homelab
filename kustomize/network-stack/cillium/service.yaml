@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cilium-agent
+  namespace: kube-system
+  labels:
+    k8s-app: cilium
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    k8s-app: cilium
+  ports:
+  - name: prometheus
+    port: 9962
+    targetPort: 9962
+    protocol: TCP

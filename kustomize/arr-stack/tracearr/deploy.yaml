@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracearr
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+    keel.sh/approvals: "1"
+    reloader.stakater.com/auto: "true"
+  labels:
+    app: tracearr
+spec:
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tracearr
+  template:
+    metadata:
+      labels:
+        app: tracearr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - eloy
+                - joel
+                - ellie
+      containers:
+      - name: tracearr
+        image: ghcr.io/connorgallopo/tracearr:latest
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        envFrom:
+        - secretRef:
+            name: tracearr-secrets

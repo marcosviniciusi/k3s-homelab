@@ -1,27 +1,28 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: unmanic-series
+  name: unmanic-animes
   labels:
-    app: unmanic-series
+    app: unmanic-animes
   annotations:
     keel.sh/policy: force
     keel.sh/trigger: poll
     keel.sh/pollSchedule: "@hourly"
     keel.sh/match-tag: "true"
-    keel.sh/approvals: "1"    
+    keel.sh/approvals: "1"
+    reloader.stakater.com/auto: "true"
 spec:
-  revisionHistoryLimit: 0
   strategy:
     type: Recreate
+  revisionHistoryLimit: 0
   replicas: 1
   selector:
     matchLabels:
-      app: unmanic-series
+      app: unmanic-animes
   template:
     metadata:
       labels:
-        app: unmanic-series
+        app: unmanic-animes
     spec:
       affinity:
         nodeAffinity:
@@ -31,12 +32,12 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - joel
+                - ellie
       containers:
-      - name: unmanic-series
+      - name: unmanic-animes
         image: josh5/unmanic:latest
         ports:
-        - name: unmanic-series
+        - name: unmanic-animes
           containerPort: 8888
         env:
         - name: PUID
@@ -49,29 +50,27 @@ spec:
           limits:
             gpu.intel.com/i915: "5"
         volumeMounts:
-        - name: unmanic-series
+        - name: unmanic-animes
           mountPath: /config
-        - name: nfs-series
-          mountPath: /data/videos/series
         - name: nfs-animes
           mountPath: /data/videos/animes
-        - name: unmanic-series-transcode
+        - name: nfs-animes-movies
+          mountPath: /data/videos/animes-movies
+        - name: unmanic-animes-transcode
           mountPath: /tmp/unmanic
       volumes:
-      - name: unmanic-series
+      - name: unmanic-animes
         persistentVolumeClaim:
-          claimName: unmanic-series
-      - name: nfs-series
+          claimName: unmanic-animes
+      - name: nfs-animes-movies
         nfs:
           server: 192.168.253.250
-          path: /export/data2/videos/series
+          path: /export/data/videos/animes-movies
       - name: nfs-animes
         nfs:
           server: 192.168.253.250
           path: /export/data2/videos/animes
-      - name: unmanic-series-transcode
+      - name: unmanic-animes-transcode
         emptyDir:
           medium: Memory
-          sizeLimit: 24Gi
-
-
+          sizeLimit: 40Gi

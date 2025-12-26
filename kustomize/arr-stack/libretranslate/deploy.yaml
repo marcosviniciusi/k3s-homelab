@@ -3,10 +3,11 @@ kind: Deployment
 metadata:
   name: libretranslate
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
+    #keel.sh/policy: force
+    #keel.sh/trigger: poll
+    #keel.sh/pollSchedule: "@hourly"
+    #keel.sh/match-tag: "true"
+    reloader.stakater.com/auto: "true"
 spec:
   strategy:
     type: Recreate
@@ -15,6 +16,10 @@ spec:
       app: libretranslate
   template:
     metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "true"
+        instrumentation.opentelemetry.io/otel-python-platform: "glibc"
+        sidecar.opentelemetry.io/inject: "true"
       labels:
         app: libretranslate
     spec:
@@ -31,17 +36,17 @@ spec:
                 - ellie
       initContainers:
       - name: init-libretranslate
-        image: libretranslate/libretranslate:latest
+        image: libretranslate/libretranslate:v1.8.3
         securityContext:
-          runAsUser: 0  # Rodando como root para poder rodar o chown
+          runAsUser: 0
         command:
           - /bin/sh
           - -c
           - |
             echo "Initializing environment..."
             mkdir -p /home/libretranslate/.local/share/argos-translate/packages
+            mkdir -p /app/db
             chown -R 1032:1032 /home/libretranslate/.local /app/db
-            # Outras tarefas iniciais podem ser colocadas aqui
             echo "Initialization complete!"
         volumeMounts:
         - name: libre-translate-models
@@ -51,6 +56,10 @@ spec:
       containers:
       - name: libretranslate
         image: libretranslate/libretranslate:latest
+        securityContext:
+          runAsUser: 1032
+          runAsGroup: 1032
+          fsGroup: 1032
         resources:
           limits:
             memory: "8Gi"
@@ -60,11 +69,10 @@ spec:
         env:
          - name: LT_DEBUG
            value: "True"
-       # - name: "LT_LOAD_ONLY"
-       #   valueFrom:
-       #     configMapKeyRef:
-       #       name: libretranslate-config
-       #       key: langs
+         - name: HOME
+           value: "/home/libretranslate"
+         - name: ARGOS_TRANSLATE_PACKAGES_DIR
+           value: "/home/libretranslate/.local/share/argos-translate/packages"
         volumeMounts:
         - name: libre-translate-models
           mountPath: /home/libretranslate/.local/

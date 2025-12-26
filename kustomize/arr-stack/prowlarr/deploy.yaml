@@ -9,6 +9,7 @@ metadata:
     keel.sh/trigger: poll
     keel.sh/pollSchedule: "@hourly"
     keel.sh/match-tag: "true"
+    reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
   strategy:
@@ -39,7 +40,7 @@ spec:
         image: ghcr.io/hotio/prowlarr:latest
         resources:
             limits:
-              memory: 2Gi
+              memory: 4Gi
               cpu: 2000m
             requests:
               memory: 1Gi
@@ -59,6 +60,8 @@ spec:
           mountPath: /data/p2p/complete/prowlarr
         - name: usenet
           mountPath: /data/usenet/complete/prowlarr
+        - name: custom-definitions
+          mountPath: /config/Definitions/Custom
         livenessProbe:
           httpGet:
             path: /
@@ -89,3 +92,6 @@ spec:
         hostPath:
           path: /data/usenet/complete/prowlarr
           type: Directory
+      - name: custom-definitions
+        configMap:
+          name: prowlarr-custom-definitions

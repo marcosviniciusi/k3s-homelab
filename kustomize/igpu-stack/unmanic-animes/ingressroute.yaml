@@ -1,15 +1,15 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: unmanic-series
+  name: unmanic-animes
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`unmanic-series-k8s.vinicima.com`) || Host(`unmanic-series.vinicima.com`)
+    - match: Host(`unmanic-animes-k8s.vinicima.com`) || Host(`unmanic-animes.vinicima.com`)
       kind: Rule
       services:
-        - name: unmanic-series
+        - name: unmanic-animes
           port: 8888
       middlewares:
         - name: body-size-50m

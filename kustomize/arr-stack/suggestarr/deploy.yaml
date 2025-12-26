@@ -10,6 +10,7 @@ metadata:
     keel.sh/pollSchedule: "@hourly"
     keel.sh/match-tag: "true"
     keel.sh/approvals: "1"
+    reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
   strategy:
@@ -22,6 +23,10 @@ spec:
     metadata:
       labels:
         app: suggestarr
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "true"
+        instrumentation.opentelemetry.io/otel-python-platform: "glibc"
+        sidecar.opentelemetry.io/inject: "true"
     spec:
       affinity:
         nodeAffinity:
@@ -65,6 +70,16 @@ spec:
           value: "America/Sao_Paulo"
         - name: SUGGESTARR_PORT
           value: "5000"
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name=sugestarr,deployment.environment=PRD,stack.app=python"
+        - name: OTEL_METRICS_EXPORTER
+          value: "otlp"
+        - name: OTEL_TRACES_SAMPLER
+          value: "parentbased_traceidratio"
+        - name: OTEL_TRACES_SAMPLER_ARG
+          value: "1"
+        - name: OTEL_INSTRUMENTATION_OKHTTP_ENABLED
+          value: "FALSE"
         volumeMounts:
         - name: suggestarr
           mountPath: /app/config/config_files

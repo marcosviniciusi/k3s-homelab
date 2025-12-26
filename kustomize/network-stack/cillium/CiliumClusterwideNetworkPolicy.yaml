@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: enable-l7-visibility-all
+spec:
+  endpointSelector: {}
+  egressDeny: []
+  ingressDeny: []
+  egress:
+  - {}
+  ingress:
+  - {}
+  enableDefaultDeny:
+    egress: false
+    ingress: false
+  labels:
+  - key: io.cilium.policy.visibility
+    value: "true"

@@ -1,0 +1,18 @@
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: freshrss
+  labels:
+    app: freshrss
+spec:
+  externalTrafficPolicy: Local
+  loadBalancerIP: 192.168.253.23
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+    protocol: TCP
+  selector:
+    app: freshrss

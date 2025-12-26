@@ -4,11 +4,10 @@ metadata:
   name: unmanic-movies
 spec:
   externalTrafficPolicy: Local
-  loadBalancerIP: 192.168.253.26
+  loadBalancerIP: 192.168.253.27
   selector:
     app: unmanic-movies
   type: LoadBalancer
   ports:
     - port: 8888
       targetPort: unmanic-movies
-      

@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jackett
+  labels:
+    app: jackett
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: jackett
+  template:
+    metadata:
+      labels:
+        app: jackett
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aloy
+                - joel
+                - ellie
+      
+      containers:
+      - name: jackett
+        image: linuxserver/jackett:latest
+        imagePullPolicy: Always
+        
+        ports:
+        - name: http
+          containerPort: 9117
+          protocol: TCP
+        
+        env:
+        - name: TZ
+          valueFrom:
+            configMapKeyRef:
+              name: jackett-config
+              key: TZ
+        - name: PUID
+          valueFrom:
+            configMapKeyRef:
+              name: jackett-config
+              key: PUID
+        - name: PGID
+          valueFrom:
+            configMapKeyRef:
+              name: jackett-config
+              key: PGID
+        
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: downloads
+          mountPath: /downloads
+        
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        
+        # StartupProbe com TCP ao invés de HTTP
+        startupProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 30
+        
+        # LivenessProbe com TCP
+        livenessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 0
+          periodSeconds: 30
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        
+        # ReadinessProbe com TCP
+        readinessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+      
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: jackett-config
+      - name: downloads
+        emptyDir: {}
+      
+      restartPolicy: Always

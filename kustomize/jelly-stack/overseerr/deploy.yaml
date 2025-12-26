@@ -9,6 +9,7 @@ metadata:
     keel.sh/trigger: poll
     keel.sh/pollSchedule: "@hourly"
     keel.sh/match-tag: "true"
+    reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
   strategy:
@@ -38,7 +39,7 @@ spec:
                 - joel
       containers:
       - name: overseerr
-        image: ghcr.io/hotio/jellyseerr:latest
+        image: fallenbagel/jellyseerr:latest
         resources:
             limits:
               memory: 4Gi
@@ -56,7 +57,7 @@ spec:
           httpGet:
             path: /
             port: 5055
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 30
           failureThreshold: 3
         readinessProbe:

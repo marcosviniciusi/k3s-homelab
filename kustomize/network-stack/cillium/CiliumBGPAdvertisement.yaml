@@ -1,0 +1,23 @@
+apiVersion: v1
+items:
+- apiVersion: cilium.io/v2
+  kind: CiliumBGPAdvertisement
+  metadata:
+    labels:
+      advertise: bgp
+    name: bgp-loadbalancer-ips
+  spec:
+    advertisements:
+    - advertisementType: Service
+      selector:
+        matchExpressions:
+        - key: somekey
+          operator: NotIn
+          values:
+          - never-used-value
+      service:
+        addresses:
+        - LoadBalancerIP
+kind: List
+metadata: {}
+

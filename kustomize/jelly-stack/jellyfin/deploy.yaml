@@ -8,7 +8,8 @@ metadata:
     keel.sh/policy: force
     keel.sh/trigger: poll
     keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"   
+    keel.sh/match-tag: "true"
+    reloader.stakater.com/auto: "true"   
 spec:
   revisionHistoryLimit: 0
   strategy:
@@ -21,6 +22,9 @@ spec:
     metadata:
       labels:
         app: jellyfin
+      annotations:
+        instrumentation.opentelemetry.io/inject-dotnet: "true"
+        sidecar.opentelemetry.io/inject: "true"
     spec:
       affinity:
         nodeAffinity:
@@ -44,23 +48,33 @@ spec:
           value: "10000"
         - name: TZ
           value: "America/Sao_Paulo"
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: "service.name=jellyfin,deployment.environment=PRD,stack.app=DOTNET"
+        - name: OTEL_METRICS_EXPORTER
+          value: "otlp"
+        - name: OTEL_TRACES_SAMPLER
+          value: "parentbased_traceidratio"
+        - name: OTEL_TRACES_SAMPLER_ARG
+          value: "1"
+        - name: OTEL_INSTRUMENTATION_OKHTTP_ENABLED
+          value: "FALSE"
         resources:
           limits:
             gpu.intel.com/i915: "2"
-      #  livenessProbe:
-      #    httpGet:
-      #      path: /
-      #      port: 8096
-      #    initialDelaySeconds: 30
-      #    periodSeconds: 60
-      #    failureThreshold: 3
-      #  readinessProbe:
-      #    httpGet:
-      #      path: /
-      #      port: 8096
-      #    initialDelaySeconds: 240
-      #    periodSeconds: 30
-      #    failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8096
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8096
+          initialDelaySeconds: 180
+          periodSeconds: 30
+          failureThreshold: 3
         volumeMounts:
         - name: jellyfin
           mountPath: /config

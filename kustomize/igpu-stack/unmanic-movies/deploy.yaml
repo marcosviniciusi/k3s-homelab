@@ -10,10 +10,11 @@ metadata:
     keel.sh/pollSchedule: "@hourly"
     keel.sh/match-tag: "true"
     keel.sh/approvals: "1"
+    reloader.stakater.com/auto: "true"    
 spec:
+  revisionHistoryLimit: 0
   strategy:
     type: Recreate
-  revisionHistoryLimit: 0
   replicas: 1
   selector:
     matchLabels:
@@ -31,7 +32,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - ellie
+                - joel
       containers:
       - name: unmanic-movies
         image: josh5/unmanic:latest
@@ -53,8 +54,6 @@ spec:
           mountPath: /config
         - name: nfs-movies
           mountPath: /data/videos/movies
-        - name: nfs-animes-movies
-          mountPath: /data/videos/animes-movies
         - name: unmanic-movies-transcode
           mountPath: /tmp/unmanic
       volumes:
@@ -65,11 +64,7 @@ spec:
         nfs:
           server: 192.168.253.250
           path: /export/data/videos/movies
-      - name: nfs-animes-movies
-        nfs:
-          server: 192.168.253.250
-          path: /export/data/videos/animes-movies
       - name: unmanic-movies-transcode
         emptyDir:
           medium: Memory
-          sizeLimit: 40Gi
+          sizeLimit: 32Gi

@@ -5,6 +5,8 @@ metadata:
     app: keel
     release: keel
   name: keel
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   strategy:
     type: Recreate

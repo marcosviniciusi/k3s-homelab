@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tracearr-service-token
+  namespace: arr
+type: Opaque
+stringData:
+  infisicalToken: st.1e5271f4-a64a-46a3-a43e-497e6e426322.72cc9929945a4da83ee716483b15241d.a7efa3f8f03c40f9f3e091e216102d61

@@ -1,0 +1,16 @@
+apiVersion: cilium.io/v2
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: homelab-pool
+spec:
+  blocks:
+  - cidr: "192.168.253.10/31"
+  - cidr: "192.168.253.12/30"
+  - cidr: "192.168.253.16/28"
+  - cidr: "192.168.253.32/27"
+  - cidr: "192.168.253.64/26"
+  - cidr: "192.168.253.128/26"
+  - cidr: "192.168.253.192/27"
+  - cidr: "192.168.253.224/28"
+  - cidr: "192.168.253.240/30"
+  - cidr: "192.168.253.244/31"

@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: unmanic-animes-log-cleaner
+  namespace: igpu
+spec:
+  schedule: "0 */6 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                    - ellie
+          containers:
+          - name: log-cleaner
+            image: busybox:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "$(date): Limpando logs do unmanic-animes..."
+              
+              if [ -d /config/.unmanic/logs/buffer/ ]; then
+                find /config/.unmanic/logs/buffer/ -type f -mtime +5 -delete 2>/dev/null || true
+                find /config/.unmanic/logs/buffer/ -type f -empty -delete 2>/dev/null || true
+                find /config/.unmanic/logs/buffer/ -mindepth 1 -type d -empty -delete 2>/dev/null || true
+                echo "$(date): Limpeza concluída!"
+              else
+                echo "$(date): Diretório não encontrado, pulando limpeza"
+              fi
+            volumeMounts:
+            - name: unmanic-animes
+              mountPath: /config
+            resources:
+              requests:
+                cpu: 10m
+                memory: 16Mi
+              limits:
+                cpu: 100m
+                memory: 32Mi
+          volumes:
+          - name: unmanic-animes
+            persistentVolumeClaim:
+              claimName: unmanic-animes
+          restartPolicy: OnFailure

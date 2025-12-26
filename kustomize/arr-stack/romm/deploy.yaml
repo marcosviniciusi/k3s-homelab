@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@hourly"
+    keel.sh/match-tag: "true"
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: romm
+  template:
+    metadata:
+      labels:
+        app: romm
+    spec:
+      enableServiceLinks: false 
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: romm
+        image: rommapp/romm:latest
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        envFrom:
+        - secretRef:
+            name: romm-secrets
+        volumeMounts:
+        - name: roms
+          mountPath: /romm/library/roms
+        - name: resources
+          mountPath: /romm/resources
+        - name: assets
+          mountPath: /romm/assets
+        - name: redis
+          mountPath: /redis-data
+        - name: config
+          mountPath: /romm/config
+      volumes:
+      - name: roms
+        hostPath:
+          path: /data/games/ROMS
+          type: Directory
+      - name: assets
+        hostPath:
+          path: /k8s/romm/ROMM-ASSETS
+          type: Directory
+      - name: resources
+        hostPath:
+          path: /k8s/romm/ASSETS
+          type: Directory
+      - name: redis
+        hostPath:
+          path: /k8s/romm/REDIS
+          type: Directory
+      - name: config
+        hostPath:
+          path: /k8s/romm/romm-config
+          type: Directory

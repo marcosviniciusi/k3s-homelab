@@ -3,10 +3,9 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/instance: uptime-kuma
-    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: uptime-kuma
     app.kubernetes.io/version: 1.23.13
-    helm.sh/chart: uptime-kuma-2.21.3
+    reloader.stakater.com/auto: "true"
   name: uptime-kuma
   namespace: tools
 spec:

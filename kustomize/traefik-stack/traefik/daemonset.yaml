@@ -90,8 +90,27 @@ spec:
           - "--ping=true"
           - "--metrics.prometheus=true"
           - "--metrics.prometheus.entrypoint=metrics"
-        
-        
+
+          - "--metrics.otlp.grpc.endpoint=signoz-infra-k8s-infra-otel-agent.signoz.svc:4317"
+          - "--metrics.otlp.grpc=true"
+          - "--metrics.otlp.grpc.insecure=true"
+          - "--metrics.otlp.pushInterval=10s"
+
+          - "--metrics.otlp.grpc.headers.service.name=traefik"
+          - "--metrics.otlp.grpc.headers.service.namespace=traefik"
+          - "--metrics.otlp.grpc.headers.deployment.environment=PRD"
+          - "--metrics.otlp.grpc.headers.k8s.cluster.name=k3s"
+
+
+          - "--tracing.otlp.grpc=true"
+          - "--tracing.otlp.grpc.endpoint=signoz-infra-k8s-infra-otel-agent.signoz.svc:4317"
+          - "--tracing.otlp.grpc.insecure=true"
+
+          - "--tracing.otlp.grpc.headers.service.name=traefik"
+          - "--tracing.otlp.grpc.headers.service.namespace=traefik"
+          - "--tracing.otlp.grpc.headers.deployment.environment=PRD"
+          - "--tracing.otlp.grpc.headers.k8s.cluster.name=k3s"
+
           - "--providers.kubernetescrd"
           - "--providers.kubernetescrd.allowCrossNamespace=true"
           - "--providers.kubernetescrd.allowExternalNameServices=true"

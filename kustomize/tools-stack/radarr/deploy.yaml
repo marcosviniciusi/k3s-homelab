@@ -9,6 +9,7 @@ metadata:
     keel.sh/trigger: poll
     keel.sh/pollSchedule: "@hourly"
     keel.sh/match-tag: "true"
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: 1
   revisionHistoryLimit: 3
