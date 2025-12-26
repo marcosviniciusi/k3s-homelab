@@ -109,7 +109,10 @@ Gerenciamento de certificados e secrets
   - **ServersTransport**: Configurações de backend (HTTPS, timeouts)
   - **DaemonSet**: Instância em cada node para alta disponibilidade
 - **MetalLB** (Namespace: `metallb-system`): Load balancer para bare-metal
-- **Calico CNI** (Namespaces: `calico-system`, `calico-apiserver`): Network plugin
+- **Cilium CNI** (Namespace: `kube-system`): Network plugin avançado com eBPF
+  - **BGP Control Plane**: Anúncio de rotas via BGP para integração com infraestrutura de rede
+  - **Hubble**: Observabilidade de rede com mapeamento de tráfego e métricas
+  - **Network Policies**: Segmentação de rede baseada em identidade
 
 ### 💾 Storage
 - **Longhorn** (Namespace: `longhorn-system`): Sistema de storage distribuído
@@ -136,7 +139,6 @@ Componentes essenciais do Kubernetes
 - **Keel**: Automação de atualizações de containers
 
 ### 🔧 Operators
-- **Tigera Operator** (Namespace: `tigera-operator`): Operador para Calico
 - **Infisical Secrets Operator**: Operador de secrets
 
 ## 🏗️ Infraestrutura do Cluster
@@ -144,7 +146,7 @@ Componentes essenciais do Kubernetes
 ### Especificações
 - **Distribuição**: K3s
 - **Nós**: 4 nodes bare-metal
-- **CNI**: Calico
+- **CNI**: Cilium com eBPF e BGP
 - **Storage**: Longhorn (distribuído)
 - **Load Balancer**: MetalLB (IP fixo: 192.168.253.11)
 - **Ingress**: Traefik (v3.6) como DaemonSet
@@ -154,7 +156,7 @@ Componentes essenciais do Kubernetes
 - **ArgoCD**: Controllers redundantes
 - **Traefik**: DaemonSet em todos os nós
 - **CoreDNS**: 3 réplicas para DNS redundante
-- **Calico**: HA com Typha e múltiplos controladores
+- **Cilium**: Distribuído com BGP para anúncio de rotas e Hubble para observabilidade
 - **Longhorn**: Storage replicado entre nós
 - **Infisical Operator**: 3 réplicas
 
@@ -172,7 +174,7 @@ Componentes essenciais do Kubernetes
 - ArgoCD instalado no cluster
 - kubectl configurado para acesso ao cluster
 - Sealed Secrets Controller instalado
-- Calico CNI configurado
+- Cilium CNI configurado com BGP
 - Longhorn storage instalado
 - MetalLB configurado
 - Traefik CRDs instalados
@@ -293,6 +295,24 @@ https://dashboard.vinicima.com
 https://dashboard-k8s.vinicima.com
 ```
 
+### Verificar Cilium e BGP
+```bash
+# Status do Cilium
+cilium status
+
+# Verificar conectividade
+cilium connectivity test
+
+# Ver peers BGP
+cilium bgp peers
+
+# Acessar Hubble UI para observabilidade
+hubble ui
+
+# Ver fluxos de rede em tempo real
+hubble observe
+```
+
 ## 🔐 Gestão de Secrets
 
 Secrets sensíveis são criptografados usando **Sealed Secrets** antes de serem commitados no Git:
@@ -318,6 +338,12 @@ Todos os exporters estão disponíveis no namespace `tools`:
 ### Uptime Monitoring
 - **Uptime Kuma**: Dashboard de status e alertas
 
+### Network Observability (Cilium Hubble)
+- Visualização de fluxos de rede L3/L4/L7
+- Mapeamento de dependências entre serviços
+- Métricas de latência e throughput
+- Troubleshooting de conectividade
+
 ### Logs e Métricas
 - Integração com stack de observabilidade (Prometheus, Grafana, Loki)
 - Logs centralizados de todas as aplicações
@@ -325,6 +351,13 @@ Todos os exporters estão disponíveis no namespace `tools`:
 - Dashboard do Traefik para visualização de rotas e middlewares
 
 ## 🎯 Funcionalidades Especiais
+
+### Cilium Features
+- **eBPF Dataplane**: Performance superior com processamento de pacotes em kernel space
+- **BGP Control Plane**: Anúncio de rotas LoadBalancer para roteadores upstream
+- **Hubble**: Observabilidade profunda de rede com visibilidade L7
+- **Network Policies**: Segmentação avançada baseada em identidade de workloads
+- **Service Mesh**: Funcionalidades de service mesh sem sidecars
 
 ### Traefik Features
 - **Virtual Hosts**: Todas as aplicações compartilham o mesmo IP (192.168.253.11)
@@ -350,9 +383,10 @@ Todos os exporters estão disponíveis no namespace `tools`:
 ### Alta Disponibilidade
 - Storage replicado via Longhorn
 - Múltiplas réplicas de componentes críticos
-- Load balancing via MetalLB
+- Load balancing via MetalLB com BGP
 - Traefik como DaemonSet (instância em cada nó)
 - Backup automatizado de volumes
+- Cilium com redundância de componentes
 
 ## 🔧 Troubleshooting
 
@@ -398,6 +432,28 @@ https://dashboard.vinicima.com
 kubectl get middleware -A
 ```
 
+### Verificar Cilium
+```bash
+# Status geral do Cilium
+cilium status
+
+# Verificar conectividade entre pods
+cilium connectivity test
+
+# Ver peers BGP e rotas anunciadas
+cilium bgp peers
+cilium bgp routes
+
+# Diagnosticar problemas de rede
+cilium monitor
+
+# Ver fluxos de rede (Hubble)
+hubble observe --namespace <namespace>
+
+# Verificar políticas de rede
+kubectl get cnp -A  # Cilium Network Policies
+```
+
 ### Verificar Storage Longhorn
 ```bash
 # Status dos volumes
@@ -421,6 +477,9 @@ kubectl get middleware <middleware-name> -n <namespace>
 
 # Ver detalhes do IngressRoute
 kubectl describe ingressroute <app-name> -n <namespace>
+
+# Verificar fluxo de rede com Hubble
+hubble observe --from-pod <namespace>/<pod-name>
 ```
 
 ## 📚 Referências
@@ -429,9 +488,10 @@ kubectl describe ingressroute <app-name> -n <namespace>
 - [Kustomize Documentation](https://kustomize.io/)
 - [K3s Documentation](https://docs.k3s.io/)
 - [Traefik Documentation](https://doc.traefik.io/traefik/)
+- [Cilium Documentation](https://docs.cilium.io/)
+- [Hubble Documentation](https://docs.cilium.io/en/stable/gettingstarted/hubble/)
 - [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets)
 - [Longhorn Documentation](https://longhorn.io/docs/)
-- [Calico Documentation](https://docs.tigera.io/calico/latest/about/)
 - [MetalLB Documentation](https://metallb.universe.tf/)
 
 ## 🤝 Contribuindo
@@ -452,11 +512,11 @@ Projeto de documentação pessoal sem licença específica. Todo o conteúdo é 
 ![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat-square&logo=argo&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
 ![Traefik](https://img.shields.io/badge/Traefik-24A1C1?style=flat-square&logo=traefikproxy&logoColor=white)
+![Cilium](https://img.shields.io/badge/Cilium-F8C517?style=flat-square&logo=cilium&logoColor=black)
 ![Longhorn](https://img.shields.io/badge/Longhorn-5E1F3F?style=flat-square)
-![Calico](https://img.shields.io/badge/Calico-003366?style=flat-square)
 
 ---
 
 **Nota**: Este é um repositório para uso pessoal em ambiente homelab. Adapte as configurações de acordo com suas necessidades.
 
-**Cluster Status**: 🟢 Operacional | **Uptime**: 205+ dias | **Apps**: 100+ pods | **Nós**: 4 | **Ingress**: Traefik v3.6
+**Cluster Status**: 🟢 Operacional | **Uptime**: 205+ dias | **Apps**: 100+ pods | **Nós**: 4 | **CNI**: Cilium+BGP | **Ingress**: Traefik v3.6
