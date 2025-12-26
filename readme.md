@@ -444,7 +444,7 @@ kubectl describe ingressroute <app-name> -n <namespace>
 
 ## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+Projeto de documentação pessoal sem licença específica. Todo o conteúdo é fornecido como está, para fins educacionais e de referência.
 
 ## 🎖️ Badges
 
