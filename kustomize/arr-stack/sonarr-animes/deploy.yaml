@@ -5,10 +5,6 @@ metadata:
   labels:
     app: sonarr-animes
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -61,13 +57,14 @@ spec:
         - name: sonarr-animes
           mountPath: /config
         - name: animes
-          mountPath: /data/videos/animes
+          mountPath: /data/videos/animes-series
         - name: p2p
-          mountPath: /data/p2p/complete/animes-tv
-        - name: cold
-          mountPath: /data/p2p/cold
+          mountPath: /data/torrent/complete/animes-tv
         - name: usenet
           mountPath: /data/usenet/complete/animes-tv
+    #    - name: betarr-script
+    #      mountPath: /etc/cont-init.d/99-betarr-setup.sh
+    #      subPath: install-dependencies.sh
       volumes:
       - name: sonarr-animes
         hostPath:
@@ -75,18 +72,17 @@ spec:
           type: Directory
       - name: animes
         hostPath:
-          path: /data2/videos/animes
+          path: /data/videos/animes-series
           type: Directory
       - name: p2p
         hostPath:
-          path: /data/p2p/complete/animes-tv
-          type: Directory
-      - name: cold
-        hostPath:
-          path: /data/p2p/cold
+          path: /data/torrent/complete/animes-tv
           type: Directory
       - name: usenet
         hostPath:
           path: /data/usenet/complete/animes-tv
           type: Directory
-
+   #   - name: betarr-script
+   #     configMap:
+   #       name: betarr
+   #       defaultMode: 0755

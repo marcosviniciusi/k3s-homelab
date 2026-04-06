@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: arr
+resources:
+  - deploy.yaml
+  - svc.yaml
+  - pvc.yaml
+  - infisical-sync.yaml
+  - sealed-secret.yaml
+  - configmap.yaml

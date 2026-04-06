@@ -4,7 +4,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: unmanic-animes
 spec:
-  storageClassName: longhorn-static
+  storageClassName: longhorn
   accessModes:
     - ReadWriteOnce
   resources:

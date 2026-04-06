@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - ghcr.io/mahcks/blockbusterr:latest@sha256:323bfc23d1a434aa13f360c319e2f22076c739aef223ce962534e4cf152ddba8

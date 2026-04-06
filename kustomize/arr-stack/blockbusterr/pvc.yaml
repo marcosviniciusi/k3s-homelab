@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: blockbusterr-data
+  labels:
+    app: blockbusterr
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn  # ajuste conforme seu storage class
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: thelounge
+  labels:
+    app: thelounge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: thelounge
+  template:
+    metadata:
+      labels:
+        app: thelounge
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aloy
+                - joel
+                - ellie
+      containers:
+        - name: thelounge
+          image: ghcr.io/thelounge/thelounge:latest
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - name: thelounge-data
+              mountPath: /var/opt/thelounge
+      volumes:
+        - name: thelounge-data
+          persistentVolumeClaim:
+            claimName: thelounge

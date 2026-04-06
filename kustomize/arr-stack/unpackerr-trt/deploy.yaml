@@ -2,10 +2,6 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
   name: unpackerr-trt
   labels:
@@ -38,6 +34,7 @@ spec:
       containers:
       - name: unpackerr-trt
         image: ghcr.io/unpackerr/unpackerr:unstable
+        imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
           runAsUser: 10000
@@ -50,10 +47,10 @@ spec:
             name: unpackerr-trt-secrets
         volumeMounts:
         - name: p2p
-          mountPath: /data/p2p/
+          mountPath: /data/torrent/
       volumes:
       - name: p2p
         hostPath:
-          path: /data/p2p/
+          path: /data/torrent/
           type: Directory
 

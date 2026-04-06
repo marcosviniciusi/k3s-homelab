@@ -5,11 +5,6 @@ metadata:
   labels:
     app: suggestarr
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
-    keel.sh/approvals: "1"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -41,7 +36,7 @@ spec:
                 - ellie
       containers:
       - name: suggestarr
-        image: ciuse99/suggestarr:latest
+        image: ciuse99/suggestarr:v2.4.3
         resources:
             limits:
               memory: 2Gi

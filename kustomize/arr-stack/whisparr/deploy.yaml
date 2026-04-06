@@ -5,10 +5,6 @@ metadata:
   labels:
     app: whisparr
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -20,9 +16,9 @@ spec:
       app: whisparr
   template:
     metadata:
-      annotations:
-        instrumentation.opentelemetry.io/inject-dotnet: "true"
-        sidecar.opentelemetry.io/inject: "true"
+      #annotations:
+      # # instrumentation.opentelemetry.io/inject-dotnet: "true"
+      #  sidecar.opentelemetry.io/inject: "true"
       labels:
         app: whisparr
     spec:
@@ -37,7 +33,7 @@ spec:
                 - nardine
       containers:
       - name: whisparr
-        image: ghcr.io/hotio/whisparr:latest
+        image: ghcr.io/hotio/whisparr:v2
         resources:
             limits:
               memory: 2Gi
@@ -70,7 +66,7 @@ spec:
         - name: xxx
           mountPath: /data/videos/xxx
         - name: p2p
-          mountPath: /data/p2p/complete/xxx
+          mountPath: /data/torrent/complete/xxx
         - name: usenet
           mountPath: /data/usenet/complete/xxx
       volumes:
@@ -80,11 +76,11 @@ spec:
           type: Directory
       - name: xxx
         hostPath:
-          path: /data2/videos/XXX
+          path: /data/videos/xxx
           type: Directory
       - name: p2p
         hostPath:
-          path: /data/p2p/complete/xxx
+          path: /data/torrent/complete/xxx
           type: Directory
       - name: usenet
         hostPath:

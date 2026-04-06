@@ -1,0 +1,426 @@
+---
+# arr
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: instrumentation
+  namespace: arr
+spec:
+  exporter:
+    endpoint: http://k8s-infra-otel-agent.signoz.svc:4317
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"
+  java:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.33.6
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  nodejs:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-nodejs:0.66.0
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  python:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:0.59b0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  dotnet:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-dotnet:0.5.0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  go:
+    image: ghcr.io/open-telemetry/opentelemetry-go-instrumentation/autoinstrumentation-go:v0.22.1
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+---
+# igpu
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: instrumentation
+  namespace: igpu
+spec:
+  exporter:
+    endpoint: http://k8s-infra-otel-agent.signoz.svc:4317
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"
+  java:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.33.6
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  nodejs:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-nodejs:0.66.0
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  python:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:0.59b0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  dotnet:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-dotnet:0.5.0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  go:
+    image: ghcr.io/open-telemetry/opentelemetry-go-instrumentation/autoinstrumentation-go:v0.22.1
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+---
+# jelly
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: instrumentation
+  namespace: jelly
+spec:
+  exporter:
+    endpoint: http://k8s-infra-otel-agent.signoz.svc:4317
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"
+  java:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.33.6
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  nodejs:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-nodejs:0.66.0
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  python:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:0.59b0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  dotnet:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-dotnet:0.5.0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  go:
+    image: ghcr.io/open-telemetry/opentelemetry-go-instrumentation/autoinstrumentation-go:v0.22.1
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+---
+# tools
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: instrumentation
+  namespace: tools
+spec:
+  exporter:
+    endpoint: http://k8s-infra-otel-agent.signoz.svc:4317
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"
+  java:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.33.6
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  nodejs:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-nodejs:0.66.0
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  python:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:0.59b0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  dotnet:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-dotnet:0.5.0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  go:
+    image: ghcr.io/open-telemetry/opentelemetry-go-instrumentation/autoinstrumentation-go:v0.22.1
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+---
+# traefik
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: instrumentation
+  namespace: traefik
+spec:
+  exporter:
+    endpoint: http://k8s-infra-otel-agent.signoz.svc:4317
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"
+  java:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.33.6
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  nodejs:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-nodejs:0.66.0
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  python:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:0.59b0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  dotnet:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-dotnet:0.5.0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  go:
+    image: ghcr.io/open-telemetry/opentelemetry-go-instrumentation/autoinstrumentation-go:v0.22.1
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+---
+# vault
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: instrumentation
+  namespace: vault
+spec:
+  exporter:
+    endpoint: http://k8s-infra-otel-agent.signoz.svc:4317
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"
+  java:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:1.33.6
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  nodejs:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-nodejs:0.66.0
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  python:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:0.59b0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  dotnet:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-dotnet:0.5.0
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  go:
+    image: ghcr.io/open-telemetry/opentelemetry-go-instrumentation/autoinstrumentation-go:v0.22.1
+    env:
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://k8s-infra-otel-agent.signoz.svc:4318
+    resourceRequirements:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi

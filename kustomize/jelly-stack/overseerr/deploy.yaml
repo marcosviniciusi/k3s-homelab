@@ -5,10 +5,6 @@ metadata:
   labels:
     app: overseerr
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -20,12 +16,19 @@ spec:
       app: overseerr
   template:
     metadata:
-      annotations:
-        instrumentation.opentelemetry.io/inject-nodejs: "true"
-        sidecar.opentelemetry.io/inject: "true"
+      #annotations:
+      #  instrumentation.opentelemetry.io/inject-nodejs: "true"
+      #  sidecar.opentelemetry.io/inject: "true"
       labels:
         app: overseerr
     spec:
+      initContainers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 1000:1000 /app/config"]
+        volumeMounts:
+        - name: overseerr
+          mountPath: /app/config
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -39,14 +42,14 @@ spec:
                 - joel
       containers:
       - name: overseerr
-        image: fallenbagel/jellyseerr:latest
+        image: ghcr.io/seerr-team/seerr:latest
         resources:
-            limits:
-              memory: 4Gi
-              cpu: 2000m
-            requests:
-              memory: 512Mi
-              cpu: 500m
+          limits:
+            memory: 4Gi
+            cpu: 2000m
+          requests:
+            memory: 512Mi
+            cpu: 500m
         ports:
         - name: overseerr
           containerPort: 5055
@@ -70,7 +73,6 @@ spec:
         - name: overseerr
           mountPath: /app/config
       volumes:
-      - name:  overseerr
+      - name: overseerr
         persistentVolumeClaim:
-          claimName:  overseerr
-
+          claimName: overseerr

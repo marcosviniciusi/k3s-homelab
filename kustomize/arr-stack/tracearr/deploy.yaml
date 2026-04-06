@@ -3,11 +3,6 @@ kind: Deployment
 metadata:
   name: tracearr
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
-    keel.sh/approvals: "1"
     reloader.stakater.com/auto: "true"
   labels:
     app: tracearr
@@ -15,7 +10,7 @@ spec:
   revisionHistoryLimit: 0
   strategy:
     type: Recreate
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: tracearr

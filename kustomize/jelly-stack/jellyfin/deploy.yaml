@@ -5,11 +5,7 @@ metadata:
   labels:
     app: jellyfin
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
-    reloader.stakater.com/auto: "true"   
+    reloader.stakater.com/auto: "true" 
 spec:
   revisionHistoryLimit: 0
   strategy:
@@ -61,73 +57,50 @@ spec:
         resources:
           limits:
             gpu.intel.com/i915: "2"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8096
-          initialDelaySeconds: 30
-          periodSeconds: 60
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8096
-          initialDelaySeconds: 180
-          periodSeconds: 30
-          failureThreshold: 3
+        #livenessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: 8096
+        #  initialDelaySeconds: 30
+        #  periodSeconds: 60
+        #  failureThreshold: 3
+        #readinessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: 8096
+        #  initialDelaySeconds: 180
+        #  periodSeconds: 30
+        #  failureThreshold: 3
         volumeMounts:
-        - name: jellyfin
+        - name: jelly-data
           mountPath: /config
-        - name: movies
-          mountPath: /data/videos/movies
-          readOnly: true
-        - name: animes-movies
-          mountPath: /data/videos/animes-movies
-          readOnly: true
-        - name: series
-          mountPath: /data/videos/series
-          readOnly: true
-        - name: animes
-          mountPath: /data/videos/animes
-          readOnly: true
-        - name: cursos
-          mountPath: /data/videos/cursos
-          readOnly: true
-        - name: xxx
-          mountPath: /data/videos/XXX
+        - name: jellyfin-metadata
+          mountPath: /config/data/metadata/
+        - name: jellyfin-cache
+          mountPath: /config/cache/
+        - name: videos
+          mountPath: /data/videos/
           readOnly: true
         - name: jellyfin-transcode
           mountPath: /config/cache/transcodes
       volumes:
-      - name: jellyfin
+      - name: jelly-data
         persistentVolumeClaim:
-          claimName: jellyfin
-      - name: movies
+          claimName: jelly-data
+      - name: jellyfin-metadata
         nfs:
           server: 192.168.253.250
-          path: /export/data/videos/movies
-      - name: animes-movies
+          path: /export/nfs-server/jellyfin/metadata/
+      - name: jellyfin-cache
         nfs:
           server: 192.168.253.250
-          path: /export/data/videos/animes-movies
-      - name: series
+          path: /export/nfs-server/jellyfin/cache/
+      - name: videos
         nfs:
           server: 192.168.253.250
-          path: /export/data2/videos/series
-      - name: animes
-        nfs:
-          server: 192.168.253.250
-          path: /export/data2/videos/animes
-      - name: cursos
-        nfs:
-          server: 192.168.253.250
-          path: /export/data2/videos/cursos
-      - name: xxx
-        nfs:
-          server: 192.168.253.250
-          path: /export/data2/videos/XXX
+          path: /export/data/videos
       - name: jellyfin-transcode
         emptyDir:
           medium: Memory
-          sizeLimit: 12Gi
+          sizeLimit: 4Gi
 

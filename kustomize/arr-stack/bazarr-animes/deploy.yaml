@@ -5,10 +5,6 @@ metadata:
   labels:
     app: bazarr-animes
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -65,21 +61,16 @@ spec:
         volumeMounts:
         - name: bazarr-animes
           mountPath: /config
-        - name: animes-movies
-          mountPath: /data/videos/animes-movies
-        - name: animes-series
-          mountPath: /data/videos/animes
+        - name: videos
+          mountPath: /data/videos
       volumes:
       - name: bazarr-animes
         hostPath:
           path: /k8s/bazarr-animes
           type: Directory
-      - name: animes-movies
+      - name: videos
         hostPath:
-          path: /data/videos/animes-movies
+          path: /data/videos/
           type: Directory
-      - name: animes-series
-        hostPath:
-          path: /data2/videos/animes
-          type: Directory
+
 

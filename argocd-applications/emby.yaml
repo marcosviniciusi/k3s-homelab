@@ -3,6 +3,10 @@ kind: Application
 metadata:
   name: emby
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: app=lscr.io/linuxserver/emby:latest
+    argocd-image-updater.argoproj.io/app.update-strategy: digest
+    argocd-image-updater.argoproj.io/write-back-method: git
 spec:
   destination:
     namespace: jelly

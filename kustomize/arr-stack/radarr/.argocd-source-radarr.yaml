@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - ghcr.io/hotio/radarr:latest@sha256:f03d5fc5b26fde8bb7061872f61820d46c2035f43ebb283c6f50b352390da578

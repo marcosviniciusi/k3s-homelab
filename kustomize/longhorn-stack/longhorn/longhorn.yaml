@@ -4234,6 +4234,13 @@ spec:
         app.kubernetes.io/version: v1.10.1
         app: longhorn-manager
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
       containers:
       - name: longhorn-manager
         image: longhornio/longhorn-manager:v1.10.1

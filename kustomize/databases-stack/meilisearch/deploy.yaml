@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meilisearch
+  labels:
+    app: meilisearch
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: meilisearch
+  template:
+    metadata:
+      labels:
+        app: meilisearch
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - nardine
+      containers:
+      - name: meilisearch
+        image: getmeili/meilisearch:v1.35.1
+        ports:
+        - name: http
+          containerPort: 7700
+          protocol: TCP
+        env:
+        - name: MEILI_HOST
+          value: "http://meilisearch:7700"
+        - name: MEILI_NO_ANALYTICS
+          value: "true"
+        envFrom:
+        - secretRef:
+            name: meilisearch-secrets
+        volumeMounts:
+        - name: data
+          mountPath: /meili_data
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: meilisearch-nardine-pvc

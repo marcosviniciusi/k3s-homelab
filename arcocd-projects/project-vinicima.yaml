@@ -6,6 +6,8 @@ metadata:
 spec:
   clusterResourceWhitelist:
   - group: '*'
+    kind: PersistentVolume
+  - group: '*'
     kind: ClusterIssuer
   - group: '*'
     kind: PriorityClass

@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: mcp-signoz
+
+commonLabels:
+  app: mcp-signoz
+  app.kubernetes.io/name: mcp-signoz
+  app.kubernetes.io/part-of: mcp-signoz
+
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  # ── API Key (SealedSecret — safe para git) ──
+  - sealed-secret.yaml
+  # ── RBAC Tokens (SealedSecret — safe para git) ──
+  - sealed-rbac-tokens.yaml

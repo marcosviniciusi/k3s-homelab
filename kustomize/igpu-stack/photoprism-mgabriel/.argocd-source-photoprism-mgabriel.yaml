@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - photoprism/photoprism:latest@sha256:5229f68bce0293320547f35c733de584d7c2d5725a0efbddb68d7a118a8fc21c

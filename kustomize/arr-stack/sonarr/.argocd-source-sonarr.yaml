@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - ghcr.io/hotio/sonarr:latest@sha256:150b7e9f796982e8a8097cf6f55583cffa3bb4f3e2ffa4de803e1ce1482a88f5

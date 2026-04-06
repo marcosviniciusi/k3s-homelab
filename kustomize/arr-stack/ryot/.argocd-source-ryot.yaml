@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - ghcr.io/ignisda/ryot:latest@sha256:190afd8903c42c63d3c1548ff7a35a7fabf4fb6e0ca6826956498d65d3d0ac22

@@ -5,11 +5,6 @@ metadata:
   labels:
     app: unmanic-animes
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
-    keel.sh/approvals: "1"
     reloader.stakater.com/auto: "true"
 spec:
   strategy:
@@ -35,7 +30,8 @@ spec:
                 - ellie
       containers:
       - name: unmanic-animes
-        image: josh5/unmanic:latest
+        image: registry.vinicima.com/unmanic:latest
+        imagePullPolicy: Always
         ports:
         - name: unmanic-animes
           containerPort: 8888
@@ -69,8 +65,8 @@ spec:
       - name: nfs-animes
         nfs:
           server: 192.168.253.250
-          path: /export/data2/videos/animes
+          path: /export/data/videos/animes-series
       - name: unmanic-animes-transcode
         emptyDir:
           medium: Memory
-          sizeLimit: 40Gi
+          sizeLimit: 32Gi

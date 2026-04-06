@@ -3,6 +3,10 @@ kind: Application
 metadata:
   name: overseerr
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: app=ghcr.io/seerr-team/seerr:latest
+    argocd-image-updater.argoproj.io/app.update-strategy: digest
+    argocd-image-updater.argoproj.io/write-back-method: git
 spec:
   destination:
     namespace: jelly

@@ -3,10 +3,6 @@ kind: Deployment
 metadata:
   name: libretranslate
   annotations:
-    #keel.sh/policy: force
-    #keel.sh/trigger: poll
-    #keel.sh/pollSchedule: "@hourly"
-    #keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   strategy:
@@ -23,6 +19,8 @@ spec:
       labels:
         app: libretranslate
     spec:
+      securityContext:
+        fsGroup: 1032
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -59,11 +57,10 @@ spec:
         securityContext:
           runAsUser: 1032
           runAsGroup: 1032
-          fsGroup: 1032
         resources:
           limits:
             memory: "8Gi"
-            cpu: "8000m"
+            cpu: "8"
         ports:
         - containerPort: 5000
         env:

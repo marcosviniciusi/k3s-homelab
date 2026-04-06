@@ -33,7 +33,7 @@ spec:
               echo "$(date): Limpando logs do unmanic-animes..."
               
               if [ -d /config/.unmanic/logs/buffer/ ]; then
-                find /config/.unmanic/logs/buffer/ -type f -mtime +5 -delete 2>/dev/null || true
+                find /config/.unmanic/logs/buffer/ -type f -mtime +3 -delete 2>/dev/null || true
                 find /config/.unmanic/logs/buffer/ -type f -empty -delete 2>/dev/null || true
                 find /config/.unmanic/logs/buffer/ -mindepth 1 -type d -empty -delete 2>/dev/null || true
                 echo "$(date): Limpeza concluída!"

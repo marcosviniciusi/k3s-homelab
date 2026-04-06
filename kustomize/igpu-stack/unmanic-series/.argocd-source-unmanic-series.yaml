@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - registry.vinicima.com/unmanic:latest@sha256:d2dbbc4485dc5148bcfe043e4abaa69d5d9b75c84ba70e0c78c148551cf93ce1

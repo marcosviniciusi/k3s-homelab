@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - lscr.io/linuxserver/emby:latest@sha256:38b5415d8982150b2740317e4248c2333de58d01955811ef93858f028eff23a1

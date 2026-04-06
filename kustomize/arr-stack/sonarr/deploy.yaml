@@ -5,10 +5,6 @@ metadata:
   labels:
     app: sonarr
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -63,11 +59,12 @@ spec:
         - name: series
           mountPath: /data/videos/series
         - name: p2p
-          mountPath: /data/p2p/complete/tv
-        - name: cold
-          mountPath: /data/p2p/cold
+          mountPath: /data/torrent/complete/tv
         - name: usenet
           mountPath: /data/usenet/complete/tv
+       # - name: betarr-script
+       #   mountPath: /etc/cont-init.d/99-betarr-setup.sh
+       #   subPath: install-dependencies.sh
       volumes:
       - name: sonarr
         hostPath:
@@ -75,18 +72,18 @@ spec:
           type: Directory
       - name: series
         hostPath:
-          path: /data2/videos/series
+          path: /data/videos/series
           type: Directory
       - name: p2p
         hostPath:
-          path: /data/p2p/complete/tv
-          type: Directory
-      - name: cold
-        hostPath:
-          path: /data/p2p/cold
+          path: /data/torrent/complete/tv
           type: Directory
       - name: usenet
         hostPath:
           path: /data/usenet/complete/tv
           type: Directory
+    #  - name: betarr-script
+    #    configMap:
+    #      name: betarr
+    #      defaultMode: 0755
 

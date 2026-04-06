@@ -5,11 +5,6 @@ metadata:
   labels:
     app: photo-mgabriel
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
-    keel.sh/approvals: "1"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0

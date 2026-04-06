@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-k8s
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mcp-k8s
+  template:
+    metadata:
+      labels:
+        app: mcp-k8s
+    spec:
+      serviceAccountName: mcp-k8s
+      containers:
+        - name: mcp-k8s
+          image: marcosviniciusi/mcp-k8s:stable
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: MCP_K8S_ENV
+              value: "PRD"
+            - name: MCP_K8S_CONFIG
+              value: /etc/mcp-k8s/config.yaml
+            - name: MCP_TRANSPORT
+              value: streamable-http
+            # Audit logging via OpenTelemetry (logs only)
+            - name: MCP_K8S_AUDIT_LOG_ENABLED
+              value: "true"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "https://signoz-ingest.vinicima.com"
+            - name: OTEL_SERVICE_NAME
+              value: "mcp-k8s"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mcp-k8s
+              readOnly: true
+            - name: kubeconfig
+              mountPath: /root/.kube
+              readOnly: true
+            - name: auth-tokens
+              mountPath: /etc/mcp-k8s/secrets
+              readOnly: true
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: config
+          configMap:
+            name: mcp-k8s-config
+        - name: kubeconfig
+          secret:
+            secretName: mcp-k8s-kubeconfig
+        - name: auth-tokens
+          secret:
+            secretName: mcp-k8s-auth-tokens
+            optional: true

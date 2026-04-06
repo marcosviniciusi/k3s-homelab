@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+data:
+  defaultTriggers: |
+    - on-sync-succeeded
+    - on-sync-failed
+    - on-health-degraded
+
+  subscriptions: |
+    - recipients:
+      - pushover
+      triggers:
+      - on-sync-succeeded
+      - on-sync-failed
+      - on-health-degraded
+
+  service.webhook.pushover: |
+    url: https://api.pushover.net/1/messages.json?token=$PUSHOVER_API_TOKEN&user=$PUSHOVER_USER_KEY&device=$PUSHOVER_USER_DEVICE
+    headers:
+    - name: Content-Type
+      value: application/x-www-form-urlencoded
+
+  template.image-updated: |
+    webhook:
+      pushover:
+        method: POST
+        body: title=🐳 {{.app.metadata.name}}&message=Image updated and synced&priority=-1&sound=pushover
+
+  template.sync-failed: |
+    webhook:
+      pushover:
+        method: POST
+        body: title=❌ {{.app.metadata.name}} sync failed&message=Sync failed&priority=-1&sound=siren
+
+  template.health-degraded: |
+    webhook:
+      pushover:
+        method: POST
+        body: title=⚠️ {{.app.metadata.name}} degraded&message=Health {{.app.status.health.status}}&priority=1&sound=siren&retry=60&expire=3600
+
+  trigger.on-sync-succeeded: |
+    - when: app.status.operationState.phase in ['Succeeded'] and app.status.sync.status == 'Synced'
+      send: [image-updated]
+
+  trigger.on-sync-failed: |
+    - when: app.status.operationState.phase in ['Error', 'Failed']
+      send: [sync-failed]
+
+  trigger.on-health-degraded: |
+    - when: app.status.health.status == 'Degraded'
+      send: [health-degraded]

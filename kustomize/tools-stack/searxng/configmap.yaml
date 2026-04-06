@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: searxng-config
+  labels:
+    app: searxng
+data:
+  settings.yml: |
+    use_default_settings: true
+
+    general:
+      instance_name: "SearXNG - Vinicima"
+      debug: false
+      privacypolicy_url: false
+      donation_url: false
+      contact_url: false
+      enable_metrics: false
+
+    search:
+      safe_search: 0
+      autocomplete: "google"
+      default_lang: "pt-BR"
+      formats:
+        - html
+        - json
+
+    server:
+      bind_address: "0.0.0.0:8080"
+      secret_key: "REPLACED_BY_ENV"
+      base_url: "https://search.vinicima.com"
+      image_proxy: true
+      http_protocol_version: "1.1"
+      method: "GET"
+
+    ui:
+      static_use_hash: true
+      default_theme: "simple"
+      theme_args:
+        simple_style: "dark"
+      infinite_scroll: true
+      query_in_title: true
+      center_alignment: true
+
+    redis:
+      url: "${SEARXNG_REDIS_URL}"
+
+    outgoing:
+      request_timeout: 5.0
+      max_request_timeout: 15.0
+      pool_connections: 100
+      pool_maxsize: 20
+      enable_http2: true
+
+    engines:
+      - name: google
+        engine: google
+        shortcut: g
+        disabled: false
+      - name: duckduckgo
+        engine: duckduckgo
+        shortcut: ddg
+        disabled: false
+      - name: brave
+        engine: brave
+        shortcut: br
+        disabled: false
+      - name: wikipedia
+        engine: wikipedia
+        shortcut: wp
+        disabled: false
+      - name: bing
+        engine: bing
+        shortcut: bi
+        disabled: false
+      - name: startpage
+        engine: startpage
+        shortcut: sp
+        disabled: false
+
+  limiter.toml: |
+    [botdetection.ip_limit]
+    link_token = false
+    [botdetection.ip_lists]
+    pass_searxng_org = false

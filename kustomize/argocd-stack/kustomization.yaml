@@ -5,3 +5,10 @@ resources:
   - ingressroute.yaml
   - serverstransport.yaml
   - servicemonitors.yaml
+  - image-updater/crd.yaml
+  - image-updater/deploy.yaml
+  - image-updater/rbac.yaml
+  - image-updater/configmap.yaml
+  - notifications-sealedsecret.yaml
+  - notifications-infisical-sync.yaml
+  - notifications-configmap.yaml

@@ -3,6 +3,11 @@ kind: Application
 metadata:
   name: jellyfin
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: app=ghcr.io/hotio/jellyfin:latest
+    argocd-image-updater.argoproj.io/app.update-strategy: digest
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/app.pull-interval: 24h
 spec:
   destination:
     namespace: jelly

@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/name: argocd-image-updater
+    app.kubernetes.io/part-of: argocd-image-updater
+  name: argocd-image-updater
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-image-updater
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: argocd-image-updater
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/argocd-image-updater
+        - run
+        env:
+        - name: APPLICATIONS_API
+          valueFrom:
+            configMapKeyRef:
+              key: applications_api
+              name: argocd-image-updater-config
+              optional: true
+        - name: ARGOCD_GRPC_WEB
+          valueFrom:
+            configMapKeyRef:
+              key: argocd.grpc_web
+              name: argocd-image-updater-config
+              optional: true
+        - name: ARGOCD_SERVER
+          valueFrom:
+            configMapKeyRef:
+              key: argocd.server_addr
+              name: argocd-image-updater-config
+              optional: true
+        - name: ARGOCD_INSECURE
+          valueFrom:
+            configMapKeyRef:
+              key: argocd.insecure
+              name: argocd-image-updater-config
+              optional: true
+        - name: ARGOCD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: argocd.token
+              name: argocd-image-updater-secret
+              optional: true
+        - name: IMAGE_UPDATER_LOGLEVEL
+          valueFrom:
+            configMapKeyRef:
+              key: log.level
+              name: argocd-image-updater-config
+              optional: true
+        image: registry.vinicima.com/argoprojlabs/argocd-image-updater:v0.18.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 30
+        name: argocd-image-updater
+        ports:
+        - containerPort: 8081
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 30
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /app/config
+          name: image-updater-conf
+        - mountPath: /tmp
+          name: tmp-dir
+        - mountPath: /app/config/ssh
+          name: ssh-known-hosts
+        - mountPath: /app/.ssh
+          name: ssh-config
+      serviceAccountName: argocd-image-updater
+      volumes:
+      - configMap:
+          items:
+          - key: registries.conf
+            path: registries.conf
+          - key: git.commit-message-template
+            path: commit.template
+          name: argocd-image-updater-config
+          optional: true
+        name: image-updater-conf
+      - emptyDir: {}
+        name: tmp-dir
+      - configMap:
+          name: argocd-ssh-known-hosts-cm
+          optional: true
+        name: ssh-known-hosts
+      - configMap:
+          items:
+          - key: config
+            path: config
+          name: argocd-image-updater-ssh-config
+          optional: true
+        name: ssh-config

@@ -1,0 +1,316 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-config
+data:
+  settings.yaml: |
+    title: Vinicima Homelab
+    favicon: https://gethomepage.dev/latest/assets/favicon.ico
+    theme: dark
+    color: slate
+    headerStyle: clean
+    layout:
+      Media Servers:
+        style: row
+        columns: 2
+      Media Management:
+        style: row
+        columns: 3
+      Subtitles:
+        style: row
+        columns: 2
+      Indexers & Search:
+        style: row
+        columns: 2
+      Downloads:
+        style: row
+        columns: 1
+      Requests:
+        style: row
+        columns: 1
+      Monitoring:
+        style: row
+        columns: 3
+      Tools:
+        style: row
+        columns: 3
+      Security:
+        style: row
+        columns: 2
+      Photos:
+        style: row
+        columns: 3
+      Media Processing:
+        style: row
+        columns: 3
+      Infrastructure:
+        style: row
+        columns: 2
+      Automation:
+        style: row
+        columns: 4
+
+  services.yaml: |
+    - Media Servers:
+        - Emby:
+            icon: emby.svg
+            href: http://192.168.253.11:8096
+            description: Media Server
+            widget:
+              type: emby
+              url: http://emby.jelly.svc:8096
+              key: "{{HOMEPAGE_VAR_EMBY_KEY}}"
+              enableBlocks: true
+              enableNowPlaying: true
+        - Jellyfin:
+            icon: jellyfin.svg
+            href: http://192.168.253.12:8096
+            description: Media Server
+            widget:
+              type: jellyfin
+              url: http://jellyfin.jelly.svc:8096
+              key: "{{HOMEPAGE_VAR_JELLYFIN_KEY}}"
+              enableBlocks: true
+              enableNowPlaying: true
+
+    - Media Management:
+        - Sonarr:
+            icon: sonarr.svg
+            href: http://192.168.253.51:8989
+            description: TV Shows
+            widget:
+              type: sonarr
+              url: http://sonarr.arr.svc:8989
+              key: "{{HOMEPAGE_VAR_SONARR_KEY}}"
+        - Sonarr Animes:
+            icon: sonarr.svg
+            href: http://192.168.253.54:8989
+            description: Anime Series
+            widget:
+              type: sonarr
+              url: http://sonarr-animes.arr.svc:8989
+              key: "{{HOMEPAGE_VAR_SONARR_ANIMES_KEY}}"
+        - Radarr:
+            icon: radarr.svg
+            href: http://192.168.253.52:7878
+            description: Movies
+            widget:
+              type: radarr
+              url: http://radarr.arr.svc:7878
+              key: "{{HOMEPAGE_VAR_RADARR_KEY}}"
+        - Radarr Animes:
+            icon: radarr.svg
+            href: http://192.168.253.55:7878
+            description: Anime Movies
+            widget:
+              type: radarr
+              url: http://radarr-animes.arr.svc:7878
+              key: "{{HOMEPAGE_VAR_RADARR_ANIMES_KEY}}"
+        - Lidarr:
+            icon: lidarr.svg
+            href: http://192.168.253.17:8686
+            description: Music
+            widget:
+              type: lidarr
+              url: http://lidarr.arr.svc:8686
+              key: "{{HOMEPAGE_VAR_LIDARR_KEY}}"
+        - Whisparr:
+            icon: whisparr.svg
+            href: http://192.168.253.15:6969
+            description: Adult Content
+            widget:
+              type: whisparr
+              url: http://whisparr.arr.svc:6969
+              key: "{{HOMEPAGE_VAR_WHISPARR_KEY}}"
+
+    - Subtitles:
+        - Bazarr:
+            icon: bazarr.svg
+            href: http://192.168.253.31:6767
+            description: Subtitles
+            widget:
+              type: bazarr
+              url: http://bazarr.arr.svc:6767
+              key: "{{HOMEPAGE_VAR_BAZARR_KEY}}"
+        - Bazarr Animes:
+            icon: bazarr.svg
+            href: http://192.168.253.32:6767
+            description: Anime Subtitles
+            widget:
+              type: bazarr
+              url: http://bazarr-animes.arr.svc:6767
+              key: "{{HOMEPAGE_VAR_BAZARR_ANIMES_KEY}}"
+
+    - Indexers & Search:
+        - Prowlarr:
+            icon: prowlarr.svg
+            href: http://192.168.253.14:9696
+            description: Indexer Manager
+            widget:
+              type: prowlarr
+              url: http://prowlarr.arr.svc:9696
+              key: "{{HOMEPAGE_VAR_PROWLARR_KEY}}"
+        - Jackett:
+            icon: jackett.svg
+            href: http://192.168.253.35:9117
+            description: Torrent Indexer
+
+    - Downloads:
+        - Autobrr:
+            icon: autobrr.svg
+            href: http://192.168.253.36:7474
+            description: Download Automation
+            widget:
+              type: autobrr
+              url: http://autobrr.arr.svc:7474
+              key: "{{HOMEPAGE_VAR_AUTOBRR_KEY}}"
+
+    - Requests:
+        - Seerr:
+            icon: overseerr.svg
+            href: https://ovs.vinicima.com
+            description: Media Requests
+            widget:
+              type: overseerr
+              url: https://ovs.vinicima.com
+              key: "{{HOMEPAGE_VAR_OVERSEERR_KEY}}"
+
+    - Monitoring:
+        - Uptime Kuma:
+            icon: uptime-kuma.svg
+            href: http://192.168.253.25:3001
+            description: Uptime Monitoring
+        - SigNoz:
+            icon: si-databricks
+            href: http://192.168.253.10:8080
+            description: Observability Platform
+        - Jellystat:
+            icon: jellyfin.svg
+            href: http://192.168.253.20:3000
+            description: Jellyfin Statistics
+
+    - Tools:
+        - FreshRSS:
+            icon: freshrss.svg
+            href: http://192.168.253.23
+            description: RSS Reader
+        - TheLounge:
+            icon: thelounge.svg
+            href: http://192.168.253.38:9000
+            description: IRC Client
+        - LibreChat:
+            icon: si-openai
+            href: https://chat.vinicima.com
+            description: AI Chat Interface
+        - Ryot:
+            icon: mdi-bookshelf
+            href: http://192.168.253.40:8000
+            description: Media Tracking
+        - Romm:
+            icon: mdi-controller-classic
+            href: http://192.168.253.34:8080
+            description: ROM Manager
+        - QRCode:
+            icon: mdi-qrcode
+            href: https://qrcode.vinicima.com
+            description: QR Code Generator
+
+    - Security:
+        - Vaultwarden:
+            icon: bitwarden.svg
+            href: https://vault.vinicima.com
+            description: Password Manager
+        - Linkwarden:
+            icon: mdi-link-box
+            href: https://linkwarden.vinicima.com
+            description: Bookmark Manager
+
+    - Photos:
+        - PhotoPrism (Marcos):
+            icon: photoprism.svg
+            href: http://192.168.253.28:2342
+            description: Photo Library
+        - PhotoPrism (Karen):
+            icon: photoprism.svg
+            href: http://192.168.253.29:2342
+            description: Photo Library
+        - PhotoPrism (Denise):
+            icon: photoprism.svg
+            href: http://192.168.253.30:2342
+            description: Photo Library
+
+    - Media Processing:
+        - Unmanic Series:
+            icon: mdi-movie-filter
+            href: https://unmanic-series.vinicima.com
+            description: Series Transcoding
+            widget:
+              type: unmanic
+              url: https://unmanic-series.vinicima.com
+        - Unmanic Movies:
+            icon: mdi-movie-filter
+            href: https://unmanic-movies.vinicima.com
+            description: Movies Transcoding
+            widget:
+              type: unmanic
+              url: https://unmanic-movies.vinicima.com
+        - Unmanic Animes:
+            icon: mdi-movie-filter
+            href: https://unmanic-animes.vinicima.com
+            description: Anime Transcoding
+            widget:
+              type: unmanic
+              url: https://unmanic-animes.vinicima.com
+
+    - Infrastructure:
+        - Proxmox:
+            icon: proxmox.svg
+            href: https://proxmox.vinicima.com
+            description: Virtualization Platform
+            widget:
+              type: proxmox
+              url: https://proxmox.vinicima.com
+              username: "{{HOMEPAGE_VAR_PROXMOX_USER}}"
+              password: "{{HOMEPAGE_VAR_PROXMOX_PASS}}"
+        - ArgoCD:
+            icon: argocd.svg
+            href: http://192.168.253.121
+            description: GitOps Deployment
+
+    - Automation:
+        - Blockbusterr:
+            icon: mdi-movie-search
+            href: http://192.168.253.39:9090
+            description: Radarr Recommendations
+        - Suggestarr:
+            icon: mdi-lightbulb
+            href: http://192.168.253.13:5000
+            description: Media Suggestions
+        - Tracearr:
+            icon: mdi-magnify
+            href: http://192.168.253.33:3000
+            description: Search Companion
+        - Neutarr:
+            icon: mdi-radar
+            href: https://huntarr.vinicima.com
+            description: Media Hunter
+
+  widgets.yaml: |
+    - search:
+        provider: google
+        target: _blank
+    - resources:
+        cpu: true
+        memory: true
+        disk: /
+        label: System
+        expanded: true
+
+  bookmarks.yaml: |
+    []
+
+  docker.yaml: |
+    ---
+
+  kubernetes.yaml: |
+    ---

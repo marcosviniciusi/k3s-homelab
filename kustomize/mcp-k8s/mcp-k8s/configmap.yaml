@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mcp-k8s-config
+data:
+  config.yaml: |
+    transport: sse
+    host: "0.0.0.0"
+    port: 8080
+
+    environments:
+      - name: PRD
+        clusters:
+          - name: aks-prd
+            kubeconfig_path: /root/.kube/config
+            context: aks-prd
+          - name: aks-prd2
+            kubeconfig_path: /root/.kube/config
+            context: aks-prd2
+          - name: eqx-prd
+            kubeconfig_path: /root/.kube/config
+            context: eqx-prd
+          - name: signoz-prd
+            kubeconfig_path: /root/.kube/config
+            context: signoz-prd
+          - name: casa-prd
+            kubeconfig_path: /root/.kube/config
+            context: casa-prd
+
+      - name: HML
+        clusters:
+          - name: aks-hml
+            kubeconfig_path: /root/.kube/config
+            context: aks-hml
+          - name: eqx-hml
+            kubeconfig_path: /root/.kube/config
+            context: eqx-hml
+          - name: signoz-hml
+            kubeconfig_path: /root/.kube/config
+            context: signoz-hml
+
+      - name: DEV
+        clusters:
+          - name: aks-dev
+            kubeconfig_path: /root/.kube/config
+            context: aks-dev
+
+    auth_tokens: []
+    auth_tokens_file: /etc/mcp-k8s/secrets/tokens.yaml

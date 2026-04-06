@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-proxmox
+  namespace: mcp-proxmox
+  labels:
+    app: mcp-proxmox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-proxmox
+  template:
+    metadata:
+      labels:
+        app: mcp-proxmox
+    spec:
+      serviceAccountName: mcp-proxmox
+      containers:
+        - name: mcp-proxmox
+          image: marcosviniciusi/mcp-proxmox:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+          env:
+            - name: MCP_PROXMOX_CONFIG
+              value: "/etc/mcp-proxmox/config.yaml"
+            - name: MCP_TRANSPORT
+              value: "streamable-http"
+            - name: MCP_PROXMOX_AUDIT_LOG_ENABLED
+              value: "true"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "https://signoz-ingest.vinicima.com"
+            - name: OTEL_SERVICE_NAME
+              value: "mcp-proxmox"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/mcp-proxmox/config.yaml
+              subPath: config.yaml
+              readOnly: true
+            - name: tokens
+              mountPath: /etc/mcp-proxmox/secrets
+              readOnly: true
+            - name: ssh-keys
+              mountPath: /etc/mcp-proxmox/ssh
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+      volumes:
+        # Config via SealedSecret (contains token_secret - NEVER use ConfigMap)
+        - name: config
+          secret:
+            secretName: mcp-proxmox-config
+        # Auth tokens via SealedSecret
+        - name: tokens
+          secret:
+            secretName: mcp-proxmox-tokens
+            optional: true
+        # SSH keys via SealedSecret
+        - name: ssh-keys
+          secret:
+            secretName: mcp-proxmox-ssh-keys
+            defaultMode: 0400
+            optional: true

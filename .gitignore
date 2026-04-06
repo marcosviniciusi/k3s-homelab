@@ -1,0 +1,25 @@
+# Secrets - never commit plaintext secrets
+**/service-token.yaml
+**/secrets.yaml
+!**/sealed-secret*.yaml
+!**/sealedsecret*.yaml
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+/tmp/
+*.tmp

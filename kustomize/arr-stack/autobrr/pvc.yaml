@@ -1,0 +1,14 @@
+# k8s/autobrr/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: autobrr-config
+  labels:
+    app: autobrr
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

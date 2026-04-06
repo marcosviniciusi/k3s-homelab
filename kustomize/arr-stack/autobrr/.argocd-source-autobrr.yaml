@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - ghcr.io/autobrr/autobrr:latest@sha256:712cf8ffa11eba28e286d632dc8ad6b17fb6d754573848a07ec91043eb03d87e

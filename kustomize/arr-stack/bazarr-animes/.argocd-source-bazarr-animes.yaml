@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - ghcr.io/hotio/bazarr:latest@sha256:004b1072983d1af766fc11d048121ded9d296fdd64ea304762afa9dfcaf51edb

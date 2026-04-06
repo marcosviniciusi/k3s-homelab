@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: emby
+  name: emby-data
 spec:
   storageClassName: longhorn-static
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 120Gi
+      storage: 20Gi

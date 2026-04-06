@@ -1,0 +1,35 @@
+# Cilium Helm values - k3s cluster
+# Managed via: helm upgrade cilium cilium/cilium -n kube-system -f values.yaml
+# Chart version: 1.19.2
+
+bgpControlPlane:
+  enabled: true
+
+hubble:
+  enabled: false
+  export:
+    dynamic:
+      enabled: false
+  metrics:
+    enabled: []
+  relay:
+    enabled: false
+
+k8sClientRateLimit:
+  burst: 400
+  qps: 200
+
+k8sServiceHost: 192.168.253.254
+k8sServicePort: 6443
+
+kubeProxyReplacement: true
+
+operator:
+  prometheus:
+    enabled: true
+    port: 9963
+  replicas: 1
+
+prometheus:
+  enabled: true
+  port: 9962

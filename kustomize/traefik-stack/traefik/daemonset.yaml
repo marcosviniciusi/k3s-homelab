@@ -27,6 +27,13 @@ spec:
         app.kubernetes.io/name: traefik
         app.kubernetes.io/instance: traefik-traefik
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
       serviceAccountName: traefik
       automountServiceAccountToken: true
       terminationGracePeriodSeconds: 60

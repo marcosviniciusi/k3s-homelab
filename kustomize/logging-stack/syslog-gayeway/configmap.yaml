@@ -9,10 +9,8 @@ data:
       syslog:
         tcp:
           listen_address: "0.0.0.0:514"
-        udp:
-          listen_address: "0.0.0.0:514"
         protocol: rfc5424
-    
+
     processors:
       # Copia atributos do syslog
       attributes:
@@ -23,7 +21,7 @@ data:
           - key: syslog.facility
             from_attribute: facility
             action: upsert
-      
+
       # Transform com flatten_data para copiar log attributes para resource
       transform:
         error_mode: ignore
@@ -33,12 +31,14 @@ data:
           - set(resource.attributes["host.name"], log.attributes["hostname"]) where log.attributes["hostname"] != nil
           - set(resource.attributes["log.source"], "syslog-gateway")
           - set(resource.attributes["deployment.environment"], "PRD")
-      
+          # Substitui o body raw pelo campo message já parseado (sem header RFC5424)
+          - set(log.body, log.attributes["message"]) where log.attributes["message"] != nil
+
       # Batch para performance
       batch:
         timeout: 10s
         send_batch_size: 1024
-    
+
     exporters:
       otlp:
         endpoint: "signoz-otel-collector.signoz-observability.svc.cluster.local:4317"
@@ -54,16 +54,16 @@ data:
           num_consumers: 10
           queue_size: 5000
         timeout: 30s
-      
+
       debug:
         verbosity: normal
         sampling_initial: 5
         sampling_thereafter: 200
-    
+
     extensions:
       health_check:
         endpoint: "0.0.0.0:13133"
-    
+
     service:
       telemetry:
         logs:

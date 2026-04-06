@@ -1,0 +1,23 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: ryot-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: ryot-service-token
+        secretNamespace: arr
+      secretsScope:
+        envSlug: production
+        secretsPath: /ryot
+
+  managedKubeSecretReferences:
+    - secretName: ryot-secrets
+      secretNamespace: arr
+      secretType: Opaque
+      template:
+        includeAllSecrets: true

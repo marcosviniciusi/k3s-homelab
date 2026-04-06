@@ -5,10 +5,6 @@ metadata:
   labels:
     app: lidarr
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -63,7 +59,7 @@ spec:
         - name: musics
           mountPath: /data/musics
         - name: p2p
-          mountPath: /data/p2p/complete/audio
+          mountPath: /data/torrent/complete/audio
         - name: usenet
           mountPath: /data/usenet/complete/audio
         - name: soulseek
@@ -79,7 +75,7 @@ spec:
           type: Directory
       - name: p2p
         hostPath:
-          path: /data/p2p/complete/audio
+          path: /data/torrent/complete/audio
           type: Directory
       - name: usenet
         hostPath:

@@ -1,0 +1,23 @@
+apiVersion: secrets.infisical.com/v1alpha1
+kind: InfisicalSecret
+metadata:
+  name: argocd-notification-infisical-secret
+spec:
+  resyncInterval: 60
+  hostAPI: "https://cofre.vinicima.com/api"
+
+  authentication:
+    serviceToken:
+      serviceTokenSecretReference:
+        secretName: argocd-notification-service-token
+        secretNamespace: argocd
+      secretsScope:
+        envSlug: production
+        secretsPath: /argocd-notification
+
+  managedKubeSecretReferences:
+    - secretName: argocd-notifications-secret
+      secretNamespace: argocd
+      secretType: Opaque
+      template:
+        includeAllSecrets: true

@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seafile
+  labels:
+    app: seafile
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # Importante: apenas 1 pod por vez
+  selector:
+    matchLabels:
+      app: seafile
+  template:
+    metadata:
+      labels:
+        app: seafile
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - aloy
+                - joel
+                - ellie
+      containers:
+      - name: seafile
+        image: seafileltd/seafile-pro-mc:12.0-latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "3Gi"
+            cpu: "2000m"
+        
+        ## Liveness probe - verifica se o container está vivo
+        #livenessProbe:
+        #  httpGet:
+        #    path: /api2/ping/
+        #    port: 80
+        #  initialDelaySeconds: 120
+        #  periodSeconds: 30
+        #  timeoutSeconds: 10
+        #  failureThreshold: 3
+        #
+        ## Readiness probe - verifica se está pronto para receber tráfego
+        #readinessProbe:
+        #  httpGet:
+        #    path: /api2/ping/
+        #    port: 80
+        #  initialDelaySeconds: 60
+        #  periodSeconds: 10
+        #  timeoutSeconds: 5
+        #  failureThreshold: 3
+        
+        volumeMounts:
+        - name: seafile-data
+          mountPath: /shared
+        
+        # Load ALL environment variables from Secret
+        envFrom:
+        - secretRef:
+            name: seafile-secrets
+      
+      volumes:
+      - name: seafile-data
+        persistentVolumeClaim:
+          claimName: seafile-data

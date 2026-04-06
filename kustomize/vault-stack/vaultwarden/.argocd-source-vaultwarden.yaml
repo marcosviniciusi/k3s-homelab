@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - vaultwarden/server:latest@sha256:43498a94b22f9563f2a94b53760ab3e710eefc0d0cac2efda4b12b9eb8690664

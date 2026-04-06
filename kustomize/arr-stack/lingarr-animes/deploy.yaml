@@ -5,10 +5,6 @@ metadata:
   labels:
     app: lingarr-animes
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -66,20 +62,16 @@ spec:
         volumeMounts:
         - name: lingarr-animes
           mountPath: /app/config
-        - name: nfs-animes-movies
-          mountPath: /data/videos/animes-movies
-        - name: nfs-animes-series
-          mountPath: /data/videos/animes
+        - name: nfs-videos
+          mountPath: /data/videos/
+
       volumes:
       - name: lingarr-animes
         persistentVolumeClaim:
           claimName: lingarr-animes
-      - name: nfs-animes-movies
+      - name: nfs-videos
         nfs:
           server: 192.168.253.250
-          path: /export/data/videos/animes-movies
-      - name: nfs-animes-series
-        nfs:
-          server: 192.168.253.250
-          path: /export/data2/videos/animes
+          path: /export/data/videos/
+
 

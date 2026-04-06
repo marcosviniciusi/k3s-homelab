@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blockbusterr
+  labels:
+    app: blockbusterr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # necessário por causa do volume RWO
+  selector:
+    matchLabels:
+      app: blockbusterr
+  template:
+    metadata:
+      labels:
+        app: blockbusterr
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - eloy
+                - joel
+                - ellie
+      containers:
+        - name: blockbusterr
+          image: ghcr.io/mahcks/blockbusterr:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+          env:
+            - name: TZ
+              value: "America/Sao_Paulo"
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9090
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9090
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: blockbusterr-data

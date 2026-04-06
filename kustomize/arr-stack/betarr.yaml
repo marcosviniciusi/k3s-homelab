@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: betarr
+  namespace: arr
+data:
+  install-dependencies.sh: |
+    #!/command/with-contenv bash
+    
+    echo "🔧 Instalando Bettarr-Notifications..."
+    
+    # Instalar dependências de build e Python
+    apk add --update --no-cache \
+        python3 \
+        py3-pip \
+        gcc \
+        musl-dev \
+        python3-dev \
+        libffi-dev \
+        openssl-dev \
+        cargo \
+        make \
+        git
+    
+    # Clonar o repositório do Bettarr
+    cd /tmp
+    git clone https://github.com/NiNiyas/Bettarr-Notifications.git
+    
+    # Copiar arquivos para /app/bettarr
+    mkdir -p /app/bettarr
+    cp -r /tmp/Bettarr-Notifications/src/* /app/bettarr/
+    
+    # Instalar dependências específicas do Bettarr
+    pip install --no-cache-dir --break-system-packages -r /app/bettarr/requirements.txt
+    
+    # Limpar repositório temporário
+    rm -rf /tmp/Bettarr-Notifications
+    
+    # Remover dependências de build para reduzir tamanho
+    apk del \
+        gcc \
+        musl-dev \
+        libffi-dev \
+        openssl-dev \
+        cargo \
+        python3-dev \
+        make
+    
+    echo "✅ Bettarr instalado em /app/bettarr"
+    ls -la /app/bettarr/

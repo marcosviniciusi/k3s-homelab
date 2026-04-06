@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - ghcr.io/hotio/jellyfin:latest@sha256:95d4a41099573fb11589c650c48d981b896c2db36719a919a78fb72bb3931326

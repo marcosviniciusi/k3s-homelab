@@ -8,3 +8,4 @@ resources:
   - middleware-01.yaml
   - middleware-02.yaml
   - ingressroute.yaml
+  - recurringjobs.yaml

@@ -5,10 +5,6 @@ metadata:
   labels:
     app: lingarr
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -66,20 +62,14 @@ spec:
         volumeMounts:
         - name: lingarr
           mountPath: /app/config
-        - name: nfs-movies
-          mountPath: /data/videos/movies
-        - name: nfs-series
-          mountPath: /data/videos/series
+        - name: nfs-videos
+          mountPath: /data/videos/
       volumes:
       - name: lingarr
         persistentVolumeClaim:
           claimName: lingarr
-      - name: nfs-movies
+      - name: nfs-videos
         nfs:
           server: 192.168.253.250
-          path: /export/data/videos/movies
-      - name: nfs-series
-        nfs:
-          server: 192.168.253.250
-          path: /export/data2/videos/series
+          path: /export/data/videos/
 

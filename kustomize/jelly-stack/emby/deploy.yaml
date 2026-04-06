@@ -5,10 +5,6 @@ metadata:
   labels:
     app: emby
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -61,72 +57,49 @@ spec:
         resources:
           limits:
             gpu.intel.com/i915: "2"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8096
-          initialDelaySeconds: 30
-          periodSeconds: 60
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8096
-          initialDelaySeconds: 240
-          periodSeconds: 30
-          failureThreshold: 3
+        #livenessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: 8096
+        #  initialDelaySeconds: 30
+        #  periodSeconds: 60
+        #  failureThreshold: 3
+        #readinessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: 8096
+        #  initialDelaySeconds: 240
+        #  periodSeconds: 30
+        #  failureThreshold: 3
         volumeMounts:
-        - name: emby
+        - name: emby-data
           mountPath: /config
-        - name: movies
-          mountPath: /data/videos/movies
-          readOnly: true
-        - name: animes-movies
-          mountPath: /data/videos/animes-movies
-          readOnly: true
-        - name: series
-          mountPath: /data/videos/series
-          readOnly: true
-        - name: animes
-          mountPath: /data/videos/animes
-          readOnly: true
-        - name: xxx
-          mountPath: /data/videos/XXX
-          readOnly: true
-        - name: cursos
-          mountPath: /data/videos/cursos
+        - name: emby-metadata
+          mountPath: /config/metadata/
+        - name: emby-cache
+          mountPath: /config/cache/
+        - name: videos
+          mountPath: /data/videos/
           readOnly: true
         - name: emby-transcode
           mountPath: /transcode
       volumes:
-      - name: emby
+      - name: emby-data
         persistentVolumeClaim:
-          claimName: emby
-      - name: movies
+          claimName: emby-data
+      - name: emby-metadata
         nfs:
           server: 192.168.253.250
-          path: /export/data/videos/movies
-      - name: animes-movies
+          path: /export/nfs-server/emby/metadata/
+      - name: emby-cache
         nfs:
           server: 192.168.253.250
-          path: /export/data/videos/animes-movies
-      - name: series
+          path: /export/nfs-server/emby/cache/
+      - name: videos
         nfs:
           server: 192.168.253.250
-          path: /export/data2/videos/series
-      - name: animes
-        nfs:
-          server: 192.168.253.250
-          path: /export/data2/videos/animes
-      - name: cursos
-        nfs:
-          server: 192.168.253.250
-          path: /export/data2/videos/cursos
-      - name: xxx
-        nfs:
-          server: 192.168.253.250
-          path: /export/data2/videos/XXX
+          path: /export/data/videos/
       - name: emby-transcode
         emptyDir:
           medium: Memory
-          sizeLimit: 12Gi
+          sizeLimit: 4Gi

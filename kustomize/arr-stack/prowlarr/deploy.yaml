@@ -5,10 +5,6 @@ metadata:
   labels:
     app: prowlarr
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -38,13 +34,6 @@ spec:
       containers:
       - name: prowlarr
         image: ghcr.io/hotio/prowlarr:latest
-        resources:
-            limits:
-              memory: 4Gi
-              cpu: 2000m
-            requests:
-              memory: 1Gi
-              cpu: 1000m
         ports:
         - name: prowlarr
           containerPort: 9696
@@ -54,14 +43,15 @@ spec:
         volumeMounts:
         - name: prowlarr
           mountPath: /config
-        - name: data
-          mountPath: /data/
         - name: p2p
-          mountPath: /data/p2p/complete/prowlarr
+          mountPath: /data/torrent/complete/prowlarr
         - name: usenet
           mountPath: /data/usenet/complete/prowlarr
         - name: custom-definitions
           mountPath: /config/Definitions/Custom
+      #  - name: betarr-script
+      #    mountPath: /etc/cont-init.d/99-betarr-setup.sh
+      #    subPath: install-dependencies.sh
         livenessProbe:
           httpGet:
             path: /
@@ -80,13 +70,9 @@ spec:
         hostPath:
           path: /k8s/prowlarr
           type: Directory
-      - name: data
-        hostPath:
-          path: /data/
-          type: Directory
       - name: p2p
         hostPath:
-          path: /data/p2p/complete/prowlarr
+          path: /data/torrent/complete/prowlarr
           type: Directory
       - name: usenet
         hostPath:
@@ -95,3 +81,7 @@ spec:
       - name: custom-definitions
         configMap:
           name: prowlarr-custom-definitions
+    #  - name: betarr-script
+    #    configMap:
+    #      name: betarr
+    #      defaultMode: 0755

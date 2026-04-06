@@ -3,6 +3,10 @@ kind: Application
 metadata:
   name: linkwarden
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: app=ghcr.io/linkwarden/linkwarden:latest
+    argocd-image-updater.argoproj.io/app.update-strategy: digest
+    argocd-image-updater.argoproj.io/write-back-method: git
 spec:
   destination:
     namespace: vault

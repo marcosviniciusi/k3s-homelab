@@ -1,0 +1,55 @@
+global:
+  clusterName: "vinicima-prd"
+  cloud: other
+  deploymentEnvironment: "PRD"
+
+otelCollectorEndpoint: "signoz-otel-collector.signoz-observability.svc.cluster.local:4317"
+otelInsecure: true
+
+presets:
+  logsCollection:
+    enabled: true
+    startAt: end
+    blacklist:
+      enabled: true
+      signozLogs: true
+      namespaces: []
+      pods:
+        - cilium
+      containers: []
+
+  hostMetrics:
+    enabled: true
+
+  kubernetesAttributes:
+    enabled: true
+
+  kubeletMetrics:
+    enabled: true
+
+# ── otelAgent (DaemonSet) — roda em TODOS os nós ─────────────────────────────
+otelAgent:
+  enabled: true
+  config:
+    processors:
+      transform/clean_body:
+        error_mode: ignore
+        log_statements:
+          - context: log
+            statements:
+              - replace_pattern(body, "^\\d{4}-\\d{2}-\\d{2}T[\\d:.]+Z?\\t", "")
+              - replace_pattern(body, "^\\d{4}-\\d{2}-\\d{2}T[\\d:.]+[+-][\\d:]+ ", "")
+              - replace_pattern(body, "^\\[\\d{4}-\\d{2}-\\d{2} [\\d:.]+\\] ", "")
+    service:
+      pipelines:
+        logs:
+          processors:
+            - resource/deployenv
+            - resourcedetection
+            - k8sattributes
+            - transform/clean_body
+            - batch
+
+# ── otelDeployment — métricas de cluster, só nos nós físicos ─────────────────
+otelDeployment:
+  enabled: true

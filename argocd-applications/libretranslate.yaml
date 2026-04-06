@@ -3,6 +3,10 @@ kind: Application
 metadata:
   name: libretranslate
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: app=libretranslate/libretranslate
+    argocd-image-updater.argoproj.io/app.update-strategy: semver
+    argocd-image-updater.argoproj.io/write-back-method: git
 spec:
   destination:
     namespace: arr

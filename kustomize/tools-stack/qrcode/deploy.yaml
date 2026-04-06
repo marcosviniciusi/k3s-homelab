@@ -6,10 +6,6 @@ metadata:
   labels:
     app: qrcode
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -55,7 +51,7 @@ spec:
                 - joel
       containers:
       - name: qrcode
-        image: docker.io/marcosviniciusi/qrcode-generator:latest
+        image: registry.vinicima.com/qrcode-generator:latest
         # Roda como www-data (UID 33)
         securityContext:
           runAsUser: 33

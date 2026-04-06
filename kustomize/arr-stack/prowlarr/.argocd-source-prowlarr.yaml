@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - ghcr.io/hotio/prowlarr:latest@sha256:a7224dea470e5e175d2926dced2d83adfc8d7b22bf8e3c63c82d67c022a22d28

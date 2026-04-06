@@ -5,10 +5,6 @@ metadata:
   labels:
     app: bazarr
   annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@hourly"
-    keel.sh/match-tag: "true"
     reloader.stakater.com/auto: "true"
 spec:
   revisionHistoryLimit: 0
@@ -65,21 +61,15 @@ spec:
         volumeMounts:
         - name: bazarr
           mountPath: /config
-        - name: movies
-          mountPath: /data/videos/movies
-        - name: series
-          mountPath: /data/videos/series
+        - name: videos
+          mountPath: /data/videos
       volumes:
       - name: bazarr
         hostPath:
           path: /k8s/bazarr
           type: Directory
-      - name: movies
+      - name: videos
         hostPath:
-          path: /data/videos/movies
-          type: Directory
-      - name: series
-        hostPath:
-          path: /data2/videos/series
+          path: /data/videos
           type: Directory
 

@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - lingarr/lingarr:latest@sha256:26b3dba8ba1d6b37bdde752418bf3f14d3fac16a3c05a64a2c840e8c507d24e5

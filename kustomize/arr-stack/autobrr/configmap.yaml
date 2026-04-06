@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: autobrr-definition
+data:
+  samaritano.yaml: |
+    name: Samaritano
+    identifier: samaritano
+    description: Samaritano Custom Indexer
+    language: pt-BR
+    urls:
+      - https://samaritano.cc/
+    privacy: private
+    protocol: torrent
+    supports:
+      - irc
+    settings:
+      - name: rsskey
+        type: secret
+        required: true
+        label: RSS key (RID)
+    irc:
+      network: SamaritanoNet
+      server: irc.samaritano.cc
+      port: 6667
+      tls: false
+      channels:
+        - "#samaritano"
+      announcers:
+        - Overlord
+      settings:
+        - name: nick
+          type: text
+          required: true
+          label: Nick
+          
+    parse:
+      type: single
+      lines:
+        - pattern: '\[(?P<category>.+?)\] \[(?P<type>.+?)\] \[(?P<torrentName>.+?)\] \[TORRENT ID: (?P<torrentId>\d+)\] \[(?P<torrentSize>.+?)\](?: \[tmdb-(?P<tags>\d+)\])?'
+          vars:
+            - category
+            - type
+            - torrentName
+            - torrentId
+            - torrentSize
+            - tags
+      match:
+          torrenturl: "/torrent/download/{{ .torrentId }}.{{ .rsskey }}"

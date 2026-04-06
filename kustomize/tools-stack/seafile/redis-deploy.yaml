@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-seafile
+  namespace: tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-seafile
+  template:
+    metadata:
+      labels:
+        app: redis-seafile
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        args: ["--save", "60", "1"]  # Sem requirepass
+        ports:
+        - containerPort: 6379

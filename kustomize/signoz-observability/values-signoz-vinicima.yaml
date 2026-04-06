@@ -1,0 +1,141 @@
+global:
+  storageClass: longhorn
+  clusterName: "vinicima-prd"
+  cloud: other
+
+# ==============================================================================
+# CLICKHOUSE — nó nardine (LXC) com hostPath no SSD enterprise
+# ==============================================================================
+clickhouse:
+  # ── Pinning no nó LXC ───────────────────────────────────────────────────────
+  nodeSelector:
+    kubernetes.io/hostname: nardine
+
+  tolerations: []
+
+  # ── Usa PVC manual apontando para hostPath no nardine ───────────────────────
+  # PV e PVC criados via clickhouse-pv-pvc.yaml antes do deploy
+  persistence:
+    enabled: true
+    existingClaim: clickhouse-nardine-pvc
+    storageClass: ""
+    size: 100Gi
+
+  # ── Limites de recurso ───────────────────────────────────────────────────────
+  resources:
+    requests:
+      cpu: 100m
+      memory: 200Mi
+    limits:
+      cpu: "4"
+      memory: 16Gi
+
+  # ── ZooKeeper — nós físicos com Longhorn ─────────────────────────────────────
+  zookeeper:
+    nodeSelector: {}  # sem restrição, fica nos nós físicos (ellie, aloy, joel)
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - ellie
+                    - aloy
+                    - joel
+
+    persistence:
+      enabled: true
+      storageClass: longhorn
+      size: 8Gi
+
+  # ── Operator — nós físicos ───────────────────────────────────────────────────
+  clickhouseOperator:
+    nodeSelector: {}
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - ellie
+                    - aloy
+                    - joel
+
+# ==============================================================================
+# SIGNOZ — nós físicos, Service LoadBalancer
+# ==============================================================================
+signoz:
+  service:
+    type: LoadBalancer
+    loadBalancerIP: 192.168.253.21
+
+  nodeSelector: {}
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - ellie
+                  - aloy
+                  - joel
+
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    size: 1Gi
+
+# ==============================================================================
+# OTEL COLLECTOR — nós físicos, Service LoadBalancer, limites de recurso
+# ==============================================================================
+otelCollector:
+  service:
+    type: LoadBalancer
+    loadBalancerIP: 192.168.253.19
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 200Mi
+    limits:
+      cpu: "4"
+      memory: 8Gi
+
+  nodeSelector: {}
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - ellie
+                  - aloy
+                  - joel
+
+# ==============================================================================
+# TELEMETRY STORE MIGRATOR — nós físicos
+# ==============================================================================
+telemetryStoreMigrator:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - ellie
+                  - aloy
+                  - joel
